@@ -67,15 +67,16 @@
       <p class="sec-lead">We kept the 2,500-year-old soul — then added the moments that make you scream "one more game."</p>
     </div>
 
-    <!-- LIVE TUTORIAL MATCH (real animated board) -->
-    <div class="match reveal">
+    <!-- LIVE 3D MATCH -->
+    <div class="scene3d-wrap reveal">
       <div class="match-top">
-        <span class="turn you" id="turnTag">● Your move</span>
-        <span class="who"><b class="you-dot">🐶 You</b> vs <b class="riv-dot">🐺 Rival</b></span>
+        <span class="turn you">● 3D Live Match</span>
+        <span class="who"><b class="you-dot">🟡 Gold Pack</b> vs <b class="riv-dot">🟢 Teal Pack</b></span>
         <span class="combo-tag">Combo <b id="comboN">0</b></span>
       </div>
-      <div class="demoboard" id="demoBoard"></div>
-      <div class="cap" id="matchCap">Two players, one board. Watch…</div>
+      <canvas id="scene3d"></canvas>
+      <div class="scene3d-fallback" id="scene3dFallback">Loading the 3D board… (needs WebGL) 🎮</div>
+      <div class="cap" id="matchCap">Two packs, one board — watch the 3D match…</div>
       <div class="combo-pop" id="comboPop"></div>
     </div>
 
@@ -158,5 +159,6 @@
 </footer>
 
 <script src="script.js"></script>
+<script type="module" src="scene.js"></script>
 </body>
 </html>
