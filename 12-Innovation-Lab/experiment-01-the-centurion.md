@@ -14,6 +14,10 @@ Reward aggression with a powerful piece that can break the stalemate.
 
 > When one of your Soldiers makes your **7th capture**, that Soldier is promoted to a **Centurion**.
 
+> 🎬 **The promotion is a hero moment** — freeze the board, the Soldier glows and transforms into a Centurion
+> with a "CENTURION!" banner + fanfare. Spec: [`../04-UXUI/game-feel-and-juice.md`](../04-UXUI/game-feel-and-juice.md).
+> Likewise, chaining captures toward the 7 should fire the **combo system** (DOUBLE/TRIPLE/ONSLAUGHT) — same doc.
+
 ### The Centurion
 - **Movement:** slides **any number of empty squares** in a straight line - up / down / left / right
   (like a chess rook), instead of one step. This lets it cross the thinned board and force captures alone.

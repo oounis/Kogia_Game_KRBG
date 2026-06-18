@@ -1,9 +1,10 @@
 # 04-UXUI
 
-**Purpose:** Look, feel & design system
+**Purpose:** Look, feel & design system — and the **game-feel / juice** that makes it addictive.
 
-**Planned contents:** Wireframes · Mobile · Tablet · Website · Branding · Design System
+**Contents:**
+- [`game-feel-and-juice.md`](game-feel-and-juice.md) ✅ — combo-capture animations (fighting-game style),
+  the Centurion promotion moment, full juice checklist, and the tech approach.
+- *(planned)* Wireframes · Mobile/Tablet layouts · Branding · Design System.
 
-**Status:** Phase 1+
-
-> Placeholder — filled in its phase (we don't pre-fill empty folders with nothing; this README documents intent).
+**Status:** ACTIVE 🎬 (game-feel spec seeded; wireframes come with Phase 1 website / Phase 2 game).
