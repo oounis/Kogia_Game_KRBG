@@ -182,4 +182,41 @@ h1,h2,h3,h4,.logo{font-family:'Cinzel',serif;letter-spacing:.02em}
   .pillars,.steps,.timeline{grid-template-columns:1fr 1fr;gap:14px}
 }
 @media(max-width:480px){.pillars,.steps,.timeline{grid-template-columns:1fr}}
+/* ===== dog-soldiers (tutorial arena) ===== */
+.ds-sprite{position:absolute}
+.ds{width:54px;height:60px;display:block;overflow:visible}
+.ds.light{--fur:#f1dcae;--fur2:#dcbd86;--helm:#f0b643;--helm2:#b9791f;--crest:#d6502f}
+.ds.dark{--fur:#9aa2ad;--fur2:#6b7480;--helm:#34d0b5;--helm2:#0e5249;--crest:#1c6b63}
+.ds.idle{animation:dbob 1.7s ease-in-out infinite}
+.ds.idle:nth-child(2n){animation-delay:.4s}.ds.idle:nth-child(3n){animation-delay:.8s}
+@keyframes dbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.ds.mover{filter:drop-shadow(0 0 10px var(--gold));transition:transform .42s cubic-bezier(.5,-.4,.35,1.5);z-index:3}
+.ds.chomp{animation:dchomp .26s}
+@keyframes dchomp{0%,100%{transform:scale(1) rotate(0)}45%{transform:scale(1.2) rotate(-6deg)}}
+.ds.yelp{animation:dyelp .32s}
+@keyframes dyelp{0%{transform:translateY(0)}40%{transform:translateY(-16px) rotate(10deg)}100%{transform:translateY(-9px)}}
+.ds.gone{animation:dtumble .55s forwards;z-index:1}
+@keyframes dtumble{to{transform:translate(46px,-66px) rotate(380deg) scale(.15);opacity:0}}
+.ds.promoted{--lop:1;filter:drop-shadow(0 0 16px var(--gold)) drop-shadow(0 0 34px rgba(240,182,67,.5));animation:dpromo .5s}
+@keyframes dpromo{0%{transform:scale(1)}50%{transform:scale(1.35) rotate(6deg)}100%{transform:scale(1.12)}}
+
+/* arena layout */
+.arena{flex-direction:column;gap:0;padding:18px;align-items:stretch}
+.vs-row{display:flex;align-items:center;justify-content:center;gap:14px;font-family:'Cinzel';font-weight:700;font-size:.84rem}
+.pl{padding:4px 12px;border-radius:30px;border:1px solid var(--line)}
+.pl.gold{color:var(--gold)}.pl.teal{color:var(--teal)}
+.vs{color:var(--ink-3);font-size:.74rem}
+.cap{margin:14px auto 4px;text-align:center;color:var(--ink-2);font-size:.92rem;font-weight:400;min-height:22px;
+  font-style:italic;transition:opacity .25s}
+.lane{flex:1;display:flex;align-items:flex-end;justify-content:center;gap:16px;min-height:96px;position:relative}
+.yip{position:absolute;font-family:'Cinzel';font-weight:900;color:#fff;font-size:.86rem;pointer-events:none;
+  text-shadow:0 1px 4px rgba(0,0,0,.6);animation:yipUp .6s forwards}
+@keyframes yipUp{0%{opacity:0;transform:translateY(0) scale(.6)}30%{opacity:1}100%{opacity:0;transform:translateY(-34px) scale(1.1)}}
+.cent2{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;position:relative}
+.cent-count{font-family:'Cinzel';font-size:1rem;color:var(--ink-2)}
+.cent-count span{color:var(--gold);font-size:1.9rem;font-weight:900}
+.cent-count i{font-style:normal;color:var(--ink-3);font-size:.8rem}
+.hero-dog{width:76px;height:84px}
+.combo-pop{z-index:5}
+
 @media(prefers-reduced-motion:reduce){*{animation:none!important}.reveal{opacity:1;transform:none}}

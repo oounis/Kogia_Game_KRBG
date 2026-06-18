@@ -57,59 +57,77 @@
     }
   }
 
-  // ---- COMBO demo loop ----
-  var csRow=document.getElementById('csRow'), comboPop=document.getElementById('comboPop'),
-      comboStage=document.getElementById('comboStage');
-  var comboWords=['','','DOUBLE','TRIPLE','ONSLAUGHT','ANNIHILATION'];
-  function buildCombo(){
-    csRow.innerHTML='';
-    var mover=document.createElement('div'); mover.className='pc l mover'; csRow.appendChild(mover);
-    for(var i=0;i<4;i++){ var e=document.createElement('div'); e.className='pc d'; csRow.appendChild(e); }
+  // helper: build a dog-soldier svg
+  function dog(cls){
+    var s=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    s.setAttribute('class','ds '+cls);
+    var u=document.createElementNS('http://www.w3.org/2000/svg','use');
+    u.setAttribute('href','#dog'); u.setAttributeNS('http://www.w3.org/1999/xlink','href','#dog');
+    s.appendChild(u); return s;
   }
+  function pulse(el,cls){ el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+
+  // ---- COMBO tutorial (your dog chains through the rival's line) ----
+  var comboLane=document.getElementById('comboLane'), comboPop=document.getElementById('comboPop'),
+      comboStage=document.getElementById('comboStage'), comboCap=document.getElementById('comboCap');
+  var comboWords=['','','DOUBLE!','TRIPLE!','ONSLAUGHT!','ANNIHILATION!'];
+  var yips=['YIP!','AWOO!','ARF!','OUCH!','WOOF!'];
   function runCombo(){
-    if(!csRow) return;
-    buildCombo();
-    var enemies=csRow.querySelectorAll('.pc.d'), hit=0;
+    if(!comboLane) return;
+    comboLane.innerHTML='';
+    comboCap.textContent='Your dog-soldier charges the rival’s line…';
+    var mover=dog('light mover'); comboLane.appendChild(mover);
+    var enemies=[];
+    for(var i=0;i<4;i++){ var e=dog('dark idle'); comboLane.appendChild(e); enemies.push(e); }
+    var hit=0;
     function strike(){
-      if(hit>=enemies.length){ setTimeout(runCombo,1400); return; }
-      enemies[hit].classList.add('gone');
+      if(hit>=enemies.length){ comboCap.textContent='ANNIHILATION! The whole line is gone 🎉'; setTimeout(runCombo,1700); return; }
+      pulse(mover,'chomp');
+      var victim=enemies[hit];
+      // yelp text
+      var y=document.createElement('span'); y.className='yip'; y.textContent=yips[hit%yips.length];
+      y.style.left=(victim.offsetLeft+6)+'px'; y.style.bottom='52px'; comboLane.appendChild(y);
+      setTimeout(function(){ if(y.parentNode) y.parentNode.removeChild(y); },650);
+      pulse(victim,'yelp');
+      setTimeout(function(){ victim.classList.add('gone'); }, 180);
       hit++;
-      comboStage.classList.remove('shake'); void comboStage.offsetWidth; comboStage.classList.add('shake');
-      if(hit>=2){
-        comboPop.textContent=comboWords[Math.min(hit,5)];
-        comboPop.classList.remove('show'); void comboPop.offsetWidth; comboPop.classList.add('show');
-      }
-      setTimeout(strike, 520);
+      pulse(comboStage,'shake');
+      if(hit>=2){ comboPop.textContent=comboWords[Math.min(hit,5)]; pulse(comboPop,'show'); comboCap.textContent='Combo x'+hit+'!'; }
+      setTimeout(strike, 620);
     }
-    setTimeout(strike, 700);
+    setTimeout(strike, 900);
   }
-  if(csRow){
-    var cio=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ runCombo(); cio.disconnect(); } }); },{threshold:.4});
-    cio.observe(csRow);
+  if(comboLane){
+    var cio=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ runCombo(); cio.disconnect(); } }); },{threshold:.35});
+    cio.observe(comboLane);
   }
 
-  // ---- CENTURION promotion loop ----
-  var centNum=document.getElementById('centNum'), centPiece=document.getElementById('centPiece'),
-      centBanner=document.getElementById('centBanner');
+  // ---- CENTURION promotion (your dog earns its crown) ----
+  var centNum=document.getElementById('centNum'), centDog=document.getElementById('centDog'),
+      centBanner=document.getElementById('centBanner'), centCap=document.getElementById('centCap'),
+      centStage=document.getElementById('centStage');
   function runCent(){
-    if(!centNum) return;
-    centPiece.classList.remove('promoted'); centNum.textContent='0';
+    if(!centNum||!centDog) return;
+    centDog.classList.remove('promoted'); centNum.textContent='0';
+    centCap.textContent='Capture 7 to promote your dog-soldier…';
     var c=0;
     var t=setInterval(function(){
-      c++; centNum.textContent=c;
-      centPiece.style.transform='scale(1.12)'; setTimeout(function(){centPiece.style.transform='scale(1)';},120);
+      c++; centNum.textContent=c; pulse(centDog,'chomp');
+      centCap.textContent='Chomp! '+c+' / 7';
       if(c>=7){
         clearInterval(t);
         setTimeout(function(){
-          centPiece.classList.add('promoted');
-          centBanner.classList.remove('show'); void centBanner.offsetWidth; centBanner.classList.add('show');
-          setTimeout(runCent, 2600);
-        }, 350);
+          centDog.classList.add('promoted');
+          pulse(centStage,'shake');
+          centBanner.textContent='CENTURION! 👑'; pulse(centBanner,'show');
+          centCap.textContent='Promoted! Now it slides across the whole board 🐶👑';
+          setTimeout(runCent, 3000);
+        }, 400);
       }
-    }, 360);
+    }, 380);
   }
   if(centNum){
-    var cio2=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ runCent(); cio2.disconnect(); } }); },{threshold:.4});
+    var cio2=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ runCent(); cio2.disconnect(); } }); },{threshold:.35});
     cio2.observe(centNum);
   }
 
