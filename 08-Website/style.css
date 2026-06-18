@@ -182,9 +182,9 @@ h1,h2,h3,h4,.logo,.title,.btn,.trick-no,.step-n,.big,.t-item b,.combo-pop,.turn{
 @media(max-width:480px){.pillars,.steps,.timeline{grid-template-columns:1fr}}
 /* 3D live match */
 .scene3d-wrap{position:relative;max-width:640px;margin:0 auto}
-#scene3d{width:100%;aspect-ratio:1/0.82;display:block;border-radius:26px;
-  background:radial-gradient(120% 90% at 50% 0%,#fff7e6,#ffe3a8);
-  box-shadow:0 16px 0 rgba(224,145,0,.26),0 28px 56px rgba(0,0,0,.16)}
+#scene3d{width:100%;aspect-ratio:1/0.82;display:block;border-radius:28px;
+  background:linear-gradient(170deg,#fff4e8 0%,#ffe7d2 58%,#ffdcc0 100%);
+  box-shadow:0 14px 0 rgba(220,150,110,.2),0 26px 52px rgba(0,0,0,.12)}
 .scene3d-fallback{text-align:center;color:var(--ink-2);padding:40px 20px;font-weight:600}
 .cap{text-align:center;color:var(--ink-2);font-size:1rem;margin:16px auto 0;min-height:24px;font-weight:600;transition:opacity .25s}
 .scene3d-wrap .combo-pop{top:38%;left:50%;font-size:2.4rem}

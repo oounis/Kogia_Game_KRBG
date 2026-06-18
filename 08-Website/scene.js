@@ -1,4 +1,4 @@
-// Kharbga: Origins — 3D live match (Three.js, local UMD global build)
+// Kharbga: Origins — 3D live match (Three.js, clay / Monument-Valley pastel style)
 /* global THREE */
 
 const canvas   = document.getElementById('scene3d');
@@ -11,78 +11,73 @@ const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 function cap(t){ if(!capEl) return; capEl.style.opacity = 0; setTimeout(() => { capEl.textContent = t; capEl.style.opacity = 1; }, 150); }
 function pop(t){ if(!popEl) return; popEl.textContent = t; popEl.classList.remove('show'); void popEl.offsetWidth; popEl.classList.add('show'); }
 
-const N = 5, TILE = 1.3;
+const N = 5, TILE = 1.25, REST_Y = 0.18;
+// soft pastel (claymorphism) palette
 const TEAMS = {
-  gold: { body: 0xffb71e, head: 0xffd778, ear: 0xe09100, helm: 0xff5b39, glow: 0xffd24a },
-  teal: { body: 0x13b58f, head: 0x6fe0c6, ear: 0x0c8e6f, helm: 0x2176d6, glow: 0x47e7c4 }
+  coral: { body: 0xef8a6a, head: 0xf6a98c, base: 0xd96e50, glow: 0xffb27a },
+  mint:  { body: 0x6fc6ad, head: 0x97dac8, base: 0x4ea791, glow: 0x9fe7d4 }
 };
 const tileToWorld = (c, r) => ({ x: (c - (N - 1) / 2) * TILE, z: (r - (N - 1) / 2) * TILE });
 
 let renderer, scene, camera, boardGroup, clock;
 let pieces = [], particles = [], dying = [], shake = 0, running = false;
-const camBase = new THREE.Vector3(0, 8.4, 10.4);
+const camBase = new THREE.Vector3(0, 6.2, 8.4);
+const camLook = new THREE.Vector3(0, 0.45, 0);
 
-function mat(color, opts = {}) {
-  return new THREE.MeshStandardMaterial({ color, roughness: opts.r ?? 0.5, metalness: opts.m ?? 0.05,
+// matte clay material
+function clay(color, opts = {}) {
+  return new THREE.MeshStandardMaterial({ color, roughness: opts.r ?? 0.92, metalness: 0,
     emissive: opts.e ?? 0x000000, emissiveIntensity: opts.ei ?? 0 });
 }
 
-function makeDog(team) {
+function makePawn(team) {
   const C = TEAMS[team], g = new THREE.Group(), bodyMats = [];
-  const add = (geo, m, x, y, z) => { const mesh = new THREE.Mesh(geo, m); mesh.position.set(x, y, z); mesh.castShadow = true; g.add(mesh); return mesh; };
-  // base coin
-  add(new THREE.CylinderGeometry(0.46, 0.54, 0.2, 30), mat(C.ear, { r: 0.4 }), 0, 0.1, 0);
-  // body
-  const bm = mat(C.body); bodyMats.push(bm);
-  const body = add(new THREE.SphereGeometry(0.46, 26, 20), bm, 0, 0.72, 0); body.scale.set(1, 1.12, 0.95);
+  const add = (geo, m, x, y, z) => { const mesh = new THREE.Mesh(geo, m); mesh.position.set(x, y, z); mesh.castShadow = true; mesh.receiveShadow = true; g.add(mesh); return mesh; };
+  // soft cushion base
+  const base = add(new THREE.SphereGeometry(0.44, 28, 20), clay(C.base), 0, 0.14, 0); base.scale.set(1, 0.34, 1);
+  // plump body
+  const bm = clay(C.body); bodyMats.push(bm);
+  const body = add(new THREE.SphereGeometry(0.42, 30, 24), bm, 0, 0.62, 0); body.scale.set(1, 1.12, 1);
   // head
-  const hm = mat(C.head); bodyMats.push(hm);
-  add(new THREE.SphereGeometry(0.37, 26, 20), hm, 0, 1.42, 0.04);
-  // snout + nose
-  add(new THREE.SphereGeometry(0.17, 18, 14), hm, 0, 1.34, 0.34);
-  add(new THREE.SphereGeometry(0.07, 12, 10), mat(0x2a1a12, { r: 0.3 }), 0, 1.37, 0.5);
-  // ears
-  const em = mat(C.ear);
-  const e1 = add(new THREE.SphereGeometry(0.14, 14, 12), em, -0.33, 1.55, 0); e1.scale.set(0.65, 1.25, 0.5); e1.rotation.z = 0.4;
-  const e2 = add(new THREE.SphereGeometry(0.14, 14, 12), em, 0.33, 1.55, 0); e2.scale.set(0.65, 1.25, 0.5); e2.rotation.z = -0.4;
-  // eyes
-  add(new THREE.SphereGeometry(0.06, 10, 8), mat(0x201510, { r: 0.2 }), -0.14, 1.46, 0.32);
-  add(new THREE.SphereGeometry(0.06, 10, 8), mat(0x201510, { r: 0.2 }), 0.14, 1.46, 0.32);
-  // helmet dome + crest
-  const helm = add(new THREE.SphereGeometry(0.39, 22, 16, 0, Math.PI * 2, 0, Math.PI * 0.55), mat(C.helm, { r: 0.35 }), 0, 1.5, 0.02);
-  const crest = add(new THREE.BoxGeometry(0.09, 0.26, 0.4), mat(C.helm, { r: 0.35 }), 0, 1.78, 0.02);
-  g.userData = { bodyMats, glow: C.glow, helm, crest };
+  const hm = clay(C.head); bodyMats.push(hm);
+  add(new THREE.SphereGeometry(0.3, 28, 22), hm, 0, 1.2, 0.02);
+  // tiny eyes (charming, minimal)
+  add(new THREE.SphereGeometry(0.045, 12, 10), clay(0x3a2a20, { r: 0.4 }), -0.11, 1.24, 0.26);
+  add(new THREE.SphereGeometry(0.045, 12, 10), clay(0x3a2a20, { r: 0.4 }), 0.11, 1.24, 0.26);
+  // little rounded ears
+  const e1 = add(new THREE.SphereGeometry(0.1, 14, 12), clay(C.base), -0.24, 1.34, 0); e1.scale.set(0.7, 1, 0.6);
+  const e2 = add(new THREE.SphereGeometry(0.1, 14, 12), clay(C.base), 0.24, 1.34, 0); e2.scale.set(0.7, 1, 0.6);
+  g.userData = { bodyMats, glow: C.glow };
   return g;
 }
 
 function buildBoard() {
   boardGroup = new THREE.Group(); scene.add(boardGroup);
-  const span = N * TILE, pad = 0.7;
-  // base
-  const base = new THREE.Mesh(new THREE.BoxGeometry(span + pad, 0.6, span + pad), mat(0xffe6b8, { r: 0.8 }));
-  base.position.y = -0.3; base.receiveShadow = true; boardGroup.add(base);
-  // rim
-  const rim = new THREE.Mesh(new THREE.BoxGeometry(span + pad + 0.18, 0.66, span + pad + 0.18), mat(0xffffff, { r: 0.7 }));
-  rim.position.y = -0.32; boardGroup.add(rim); rim.renderOrder = -1;
-  // tiles
+  const span = N * TILE;
+  // soft frame (bevel) + base
+  const frame = new THREE.Mesh(new THREE.BoxGeometry(span + 1.0, 0.4, span + 1.0), clay(0xfff6e9, { r: 0.95 }));
+  frame.position.y = -0.5; frame.receiveShadow = true; boardGroup.add(frame);
+  const baseB = new THREE.Mesh(new THREE.BoxGeometry(span + 0.5, 0.42, span + 0.5), clay(0xf4e6cb, { r: 0.95 }));
+  baseB.position.y = -0.22; baseB.receiveShadow = true; boardGroup.add(baseB);
+  // tiles — gentle two-tone with a soft coral Citadel
   for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
     const isMid = (c === (N - 1) / 2 && r === (N - 1) / 2);
-    const col = isMid ? 0xffb71e : ((c + r) % 2 ? 0xfff0cf : 0xffe0a0);
-    const m = mat(col, { r: 0.75, e: isMid ? 0xffa000 : 0x000000, ei: isMid ? 0.45 : 0 });
-    const t = new THREE.Mesh(new THREE.BoxGeometry(TILE * 0.92, 0.12, TILE * 0.92), m);
-    const w = tileToWorld(c, r); t.position.set(w.x, 0.06, w.z); t.receiveShadow = true; boardGroup.add(t);
+    const col = isMid ? 0xffc89a : ((c + r) % 2 ? 0xfff1dc : 0xf3dfba);
+    const m = clay(col, { r: 0.9, e: isMid ? 0xff9a5a : 0x000000, ei: isMid ? 0.35 : 0 });
+    const t = new THREE.Mesh(new THREE.BoxGeometry(TILE * 0.9, 0.14, TILE * 0.9), m);
+    const w = tileToWorld(c, r); t.position.set(w.x, 0.07, w.z); t.receiveShadow = true; boardGroup.add(t);
   }
 }
 
 function addPiece(team, c, r) {
-  const g = makeDog(team); g.scale.setScalar(0.62);
-  const w = tileToWorld(c, r); g.position.set(w.x, 0, w.z);
+  const g = makePawn(team); g.scale.setScalar(0.72);
+  const w = tileToWorld(c, r); g.position.set(w.x, REST_Y, w.z);
   boardGroup.add(g);
   const p = { g, team, c, r, phase: Math.random() * 6.28, anim: null, squash: 0, promoted: false, crown: null, grow: 0 };
   pieces.push(p); return p;
 }
 
-function hop(p, c, r, dur = 0.55, arc = 0.95) {
+function hop(p, c, r, dur = 0.55, arc = 0.85) {
   return new Promise(res => {
     const from = { x: p.g.position.x, z: p.g.position.z }, to = tileToWorld(c, r);
     p.c = c; p.r = r; p.anim = { from, to, t: 0, dur, arc, done: res };
@@ -91,26 +86,22 @@ function hop(p, c, r, dur = 0.55, arc = 0.95) {
 const easeIO = (p) => p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
 
 function spawnParticles(pos, color) {
-  const m = mat(color, { r: 0.3, e: color, ei: 0.4 });
-  for (let i = 0; i < 16; i++) {
-    const s = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 6), m);
-    s.position.copy(pos); s.position.y += 0.7; boardGroup.add(s);
-    const a = Math.random() * 6.28, sp = 0.04 + Math.random() * 0.07;
-    particles.push({ s, vx: Math.cos(a) * sp, vy: 0.07 + Math.random() * 0.09, vz: Math.sin(a) * sp, life: 1 });
+  const m = clay(color, { r: 0.5, e: color, ei: 0.3 });
+  for (let i = 0; i < 12; i++) {
+    const s = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 6), m);
+    s.position.copy(pos); s.position.y += 0.6; boardGroup.add(s);
+    const a = Math.random() * 6.28, sp = 0.03 + Math.random() * 0.05;
+    particles.push({ s, vx: Math.cos(a) * sp, vy: 0.06 + Math.random() * 0.07, vz: Math.sin(a) * sp, life: 1 });
   }
 }
-function capture(p) {
-  spawnParticles(p.g.position, TEAMS[p.team].glow);
-  dying.push({ g: p.g, t: 0 });
-  pieces = pieces.filter(x => x !== p);
-}
+function capture(p) { spawnParticles(p.g.position, TEAMS[p.team].glow); dying.push({ g: p.g, t: 0 }); pieces = pieces.filter(x => x !== p); }
 function squash(p) { p.squash = 1; }
-function shakeNow() { shake = 0.4; }
+function shakeNow() { shake = 0.28; }
 function promote(p) {
   p.promoted = true; p.grow = 1;
-  p.g.userData.bodyMats.forEach(bm => { bm.emissive = new THREE.Color(p.g.userData.glow); bm.emissiveIntensity = 0.6; });
-  const crown = new THREE.Mesh(new THREE.TorusGeometry(0.26, 0.08, 10, 22), mat(0xffd24a, { m: 0.6, r: 0.25, e: 0xffb71e, ei: 0.5 }));
-  crown.rotation.x = Math.PI / 2; crown.position.y = 2.05; crown.castShadow = true; p.g.add(crown); p.crown = crown;
+  p.g.userData.bodyMats.forEach(bm => { bm.emissive = new THREE.Color(p.g.userData.glow); bm.emissiveIntensity = 0.45; });
+  const crown = new THREE.Mesh(new THREE.TorusGeometry(0.22, 0.07, 12, 24), clay(0xf2c66a, { r: 0.4, e: 0xe0a23a, ei: 0.4 }));
+  crown.rotation.x = Math.PI / 2; crown.position.y = 1.62; crown.castShadow = true; p.g.add(crown); p.crown = crown;
 }
 
 function clearBoard() {
@@ -122,15 +113,15 @@ function clearBoard() {
 
 async function play() {
   clearBoard();
-  addPiece('gold', 0, 2); addPiece('gold', 2, 0); addPiece('gold', 2, 4); addPiece('gold', 4, 2);
-  const t1 = addPiece('teal', 1, 2), t2 = addPiece('teal', 2, 1), t3 = addPiece('teal', 2, 3), t4 = addPiece('teal', 3, 2);
-  addPiece('teal', 0, 0); addPiece('gold', 4, 4);
-  const m = addPiece('gold', 1, 0);
+  addPiece('coral', 0, 2); addPiece('coral', 2, 0); addPiece('coral', 2, 4); addPiece('coral', 4, 2);
+  const t1 = addPiece('mint', 1, 2), t2 = addPiece('mint', 2, 1), t3 = addPiece('mint', 2, 3), t4 = addPiece('mint', 3, 2);
+  addPiece('mint', 0, 4); addPiece('coral', 4, 4);
+  const m = addPiece('coral', 1, 0);
   comboEl && (comboEl.textContent = '0');
 
-  cap('Two packs face off. Gold to move…'); await sleep(1300);
-  cap('Hop into the Citadel — and surround them!');
-  await hop(m, 2, 2, 0.62, 1.15); await sleep(250);
+  cap('Two packs face off — Coral to move…'); await sleep(1300);
+  cap('Hop into the Citadel and surround them!');
+  await hop(m, 2, 2, 0.6, 1.05); await sleep(260);
 
   const words = ['', '', 'DOUBLE!', 'TRIPLE!', 'ONSLAUGHT!', 'ANNIHILATION!'];
   const targets = [t1, t2, t3, t4]; let hits = 0;
@@ -138,14 +129,14 @@ async function play() {
     squash(m); capture(tg); hits++; comboEl && (comboEl.textContent = hits); shakeNow();
     if (hits >= 2) pop(words[Math.min(hits, 5)]);
     cap(hits === 1 ? 'CAPTURE! 🎯' : 'Combo x' + hits + '!');
-    await sleep(640);
+    await sleep(650);
   }
   await sleep(520);
   cap('7 captures — crown your Centurion!');
   promote(m); pop('CENTURION! 👑'); shakeNow(); await sleep(1500);
-  cap('The Centurion now slides across the board!');
-  await hop(m, 3, 2, 0.5, 0.5); await hop(m, 1, 2, 0.62, 0.5); await hop(m, 2, 2, 0.62, 0.5);
-  cap('Your turn — fancy one more game? 🐾'); await sleep(1600);
+  cap('The Centurion glides across the board!');
+  await hop(m, 3, 2, 0.5, 0.4); await hop(m, 1, 2, 0.6, 0.4); await hop(m, 2, 2, 0.6, 0.4);
+  cap('Your turn — fancy one more? 🐾'); await sleep(1600);
   play();
 }
 
@@ -157,41 +148,38 @@ function resize() {
 
 function loop() {
   const dt = Math.min(clock.getDelta(), 0.05), time = clock.elapsedTime;
-  boardGroup.rotation.y += 0.0025;
+  // gentle SWAY (not a full spin)
+  boardGroup.rotation.y = Math.sin(time * 0.32) * 0.13;
 
   pieces.forEach(p => {
     if (p.anim) {
       const a = p.anim; a.t += dt; const pr = Math.min(a.t / a.dur, 1), e = easeIO(pr);
       p.g.position.x = a.from.x + (a.to.x - a.from.x) * e;
       p.g.position.z = a.from.z + (a.to.z - a.from.z) * e;
-      p.g.position.y = a.arc * Math.sin(Math.PI * pr);
-      if (pr >= 1) { p.g.position.y = 0; p.anim = null; p.squash = 1; a.done && a.done(); }
+      p.g.position.y = REST_Y + a.arc * Math.sin(Math.PI * pr);
+      if (pr >= 1) { p.g.position.y = REST_Y; p.anim = null; p.squash = 1; a.done && a.done(); }
     } else {
-      p.g.position.y = Math.sin(time * 2 + p.phase) * 0.04;
+      p.g.position.y = REST_Y + Math.sin(time * 1.8 + p.phase) * 0.035;
     }
-    // squash & stretch
-    if (p.squash > 0) { p.squash = Math.max(0, p.squash - dt * 4); const s = Math.sin(p.squash * Math.PI) * 0.18; p.g.scale.set(0.62 * (1 + s), 0.62 * (1 - s), 0.62 * (1 + s)); }
-    else if (p.grow > 0) { p.grow = Math.max(0, p.grow - dt * 2); const s = 0.62 * (1 + Math.sin(p.grow * Math.PI) * 0.3); p.g.scale.setScalar(s); }
-    else p.g.scale.setScalar(p.promoted ? 0.7 : 0.62);
-    if (p.crown) p.crown.rotation.z += dt * 2;
+    if (p.squash > 0) { p.squash = Math.max(0, p.squash - dt * 4); const s = Math.sin(p.squash * Math.PI) * 0.16; p.g.scale.set(0.72 * (1 + s), 0.72 * (1 - s), 0.72 * (1 + s)); }
+    else if (p.grow > 0) { p.grow = Math.max(0, p.grow - dt * 2); const s = 0.72 * (1 + Math.sin(p.grow * Math.PI) * 0.28); p.g.scale.setScalar(s); }
+    else p.g.scale.setScalar(p.promoted ? 0.8 : 0.72);
+    if (p.crown) p.crown.rotation.z += dt * 1.6;
   });
 
-  // particles
   particles = particles.filter(pt => {
-    pt.vy -= dt * 0.4; pt.s.position.x += pt.vx; pt.s.position.y += pt.vy; pt.s.position.z += pt.vz;
+    pt.vy -= dt * 0.35; pt.s.position.x += pt.vx; pt.s.position.y += pt.vy; pt.s.position.z += pt.vz;
     pt.life -= dt * 1.7; pt.s.scale.setScalar(Math.max(0.01, pt.life));
     if (pt.life <= 0) { boardGroup.remove(pt.s); return false; } return true;
   });
-  // dying pieces
   dying = dying.filter(d => {
-    d.t += dt * 2.6; const k = Math.max(0, 1 - d.t); d.g.scale.setScalar(0.62 * k); d.g.rotation.y += dt * 12; d.g.position.y = d.t * 0.6;
+    d.t += dt * 2.6; const k = Math.max(0, 1 - d.t); d.g.scale.setScalar(0.72 * k); d.g.rotation.y += dt * 10; d.g.position.y = REST_Y + d.t * 0.5;
     if (d.t >= 1) { boardGroup.remove(d.g); return false; } return true;
   });
 
-  // camera with shake
   shake = Math.max(0, shake - dt);
   camera.position.set(camBase.x + (Math.random() * 2 - 1) * shake, camBase.y + (Math.random() * 2 - 1) * shake * 0.5, camBase.z);
-  camera.lookAt(0, 0.7, 0);
+  camera.lookAt(camLook);
 
   renderer.render(scene, camera);
 }
@@ -204,15 +192,17 @@ try {
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100); camera.position.copy(camBase); camera.lookAt(0, 0.7, 0);
+  camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100); camera.position.copy(camBase); camera.lookAt(camLook);
 
-  scene.add(new THREE.HemisphereLight(0xfff4e2, 0x9a7b52, 0.65));
-  scene.add(new THREE.AmbientLight(0xfff1de, 0.35));
-  const key = new THREE.DirectionalLight(0xfff0d0, 1.25); key.position.set(5, 11, 6); key.castShadow = true;
-  key.shadow.mapSize.set(1024, 1024); key.shadow.camera.near = 1; key.shadow.camera.far = 40;
-  key.shadow.camera.left = -8; key.shadow.camera.right = 8; key.shadow.camera.top = 8; key.shadow.camera.bottom = -8; key.shadow.bias = -0.0006;
+  // soft, clay-friendly lighting (lots of fill, gentle shadows)
+  scene.add(new THREE.HemisphereLight(0xfff5e8, 0xe8c9a6, 0.95));
+  scene.add(new THREE.AmbientLight(0xfff2e0, 0.25));
+  const key = new THREE.DirectionalLight(0xfff1da, 0.9); key.position.set(4.5, 9, 6); key.castShadow = true;
+  key.shadow.mapSize.set(1024, 1024); key.shadow.radius = 5; key.shadow.bias = -0.0006;
+  key.shadow.camera.near = 1; key.shadow.camera.far = 36;
+  key.shadow.camera.left = -7; key.shadow.camera.right = 7; key.shadow.camera.top = 7; key.shadow.camera.bottom = -7;
   scene.add(key);
-  const rim = new THREE.DirectionalLight(0xff7a4a, 0.4); rim.position.set(-6, 4, -5); scene.add(rim);
+  const fill = new THREE.DirectionalLight(0xffd9b8, 0.3); fill.position.set(-5, 4, -4); scene.add(fill);
 
   clock = new THREE.Clock();
   buildBoard();
