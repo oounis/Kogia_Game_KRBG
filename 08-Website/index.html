@@ -19,29 +19,7 @@
 <!-- animated background -->
 <div class="bg"><div class="bg-glow g1"></div><div class="bg-glow g2"></div><div class="stars" id="stars"></div></div>
 
-<!-- dog-soldier sprite (defined once, recoloured per army) -->
-<svg class="ds-sprite" width="0" height="0" aria-hidden="true"><symbol id="dog" viewBox="0 0 100 112">
-  <ellipse cx="50" cy="107" rx="27" ry="4.5" fill="rgba(0,0,0,.28)"/>
-  <path d="M30 72 Q30 60 50 60 Q70 60 70 72 L74 99 Q50 109 26 99 Z" fill="var(--fur)"/>
-  <ellipse cx="37" cy="101" rx="8" ry="6" fill="var(--fur2)"/><ellipse cx="63" cy="101" rx="8" ry="6" fill="var(--fur2)"/>
-  <path d="M24 42 Q12 50 19 72 Q28 66 31 53 Z" fill="var(--fur2)"/>
-  <path d="M76 42 Q88 50 81 72 Q72 66 69 53 Z" fill="var(--fur2)"/>
-  <circle cx="50" cy="47" r="23" fill="var(--fur)"/>
-  <ellipse cx="50" cy="55" rx="12" ry="9" fill="var(--fur2)"/>
-  <ellipse cx="50" cy="51" rx="3.6" ry="2.8" fill="#241712"/>
-  <path d="M50 53 Q50 60 45 60 M50 53 Q50 60 55 60" stroke="#241712" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-  <circle class="ey" cx="42" cy="44" r="5" fill="#fff"/><circle class="ey" cx="58" cy="44" r="5" fill="#fff"/>
-  <circle cx="43" cy="45" r="2.6" fill="#241712"/><circle cx="57" cy="45" r="2.6" fill="#241712"/>
-  <circle cx="41.5" cy="43" r="1" fill="#fff"/><circle cx="55.5" cy="43" r="1" fill="#fff"/>
-  <path d="M27 37 Q27 16 50 16 Q73 16 73 37 Q73 41 69 41 L31 41 Q27 41 27 37 Z" fill="var(--helm)"/>
-  <rect x="27" y="36.5" width="46" height="6" rx="3" fill="var(--helm2)"/>
-  <path d="M47 16 Q43 4 50 2 Q57 4 53 16 Z" fill="var(--crest)"/>
-  <g opacity="var(--lop,0)">
-    <path d="M30 22 Q18 12 27 3 Q33 13 41 15 Z" fill="#f0c84b"/>
-    <path d="M70 22 Q82 12 73 3 Q67 13 59 15 Z" fill="#f0c84b"/>
-    <circle cx="50" cy="7" r="3.4" fill="#ffe07a"/>
-  </g>
-</symbol></svg>
+<!-- pieces are emoji avatars, rendered in JS -->
 
 <!-- NAV -->
 <header class="nav" id="nav">
@@ -89,43 +67,33 @@
       <p class="sec-lead">We kept the 2,500-year-old soul — then added the moments that make you scream "one more game."</p>
     </div>
 
-    <!-- COMBO -->
-    <div class="trick reveal">
-      <div class="trick-demo arena" id="comboStage">
-        <div class="vs-row"><span class="pl gold">🟡 You</span><span class="vs">VS</span><span class="pl teal">Rival 🔵</span></div>
-        <div class="cap" id="comboCap">Your dog-soldier charges the rival's line…</div>
-        <div class="lane" id="comboLane"></div>
-        <div class="combo-pop" id="comboPop"></div>
+    <!-- LIVE TUTORIAL MATCH (real animated board) -->
+    <div class="match reveal">
+      <div class="match-top">
+        <span class="turn you" id="turnTag">● Your move</span>
+        <span class="who"><b class="you-dot">🐶 You</b> vs <b class="riv-dot">🐺 Rival</b></span>
+        <span class="combo-tag">Combo <b id="comboN">0</b></span>
       </div>
-      <div class="trick-copy">
-        <span class="trick-no">01</span>
-        <h3>Combo Captures</h3>
-        <p>Each piece is a loyal little <b>dog-soldier</b> (yes — the old players of Tataouine always called
-        them "the dogs" 🐶). Trap an enemy between two of yours and it falls — then <b>keep going</b>. One
-        dog-soldier can chain through three, four, five captures in a single turn:
-        <b class="hl">DOUBLE → TRIPLE → ONSLAUGHT → ANNIHILATION</b> — with yelps, screen-shake and slow-mo.
-        It feels like a fighting-game finisher. 🥊</p>
-      </div>
+      <div class="demoboard" id="demoBoard"></div>
+      <div class="cap" id="matchCap">Two players, one board. Watch…</div>
+      <div class="combo-pop" id="comboPop"></div>
     </div>
 
-    <!-- CENTURION -->
-    <div class="trick flip reveal">
-      <div class="trick-demo arena" id="centStage">
-        <div class="vs-row"><span class="pl gold">🟡 You</span><span class="vs">VS</span><span class="pl teal">Rival 🔵</span></div>
-        <div class="cap" id="centCap">Capture 7 to promote your dog-soldier…</div>
-        <div class="cent2">
-          <div class="cent-count"><span id="centNum">0</span><i>/ 7</i></div>
-          <svg class="ds light hero-dog" id="centDog"><use href="#dog"/></svg>
-        </div>
-        <div class="combo-pop" id="centBanner">CENTURION! 👑</div>
+    <!-- FEATURES -->
+    <div class="feat-row reveal">
+      <div class="feat">
+        <span class="trick-no">01</span>
+        <h3>Combo Captures 🥊</h3>
+        <p>Trap a rival between two of your <b>dog-soldiers</b> and it falls — then <b>keep going</b>. One piece
+        can chain three, four, five captures in a single turn: <b class="hl">DOUBLE → TRIPLE → ONSLAUGHT →
+        ANNIHILATION</b> — with screen-shake and slow-mo. A fighting-game finisher on a desert board.</p>
       </div>
-      <div class="trick-copy">
+      <div class="feat">
         <span class="trick-no">02</span>
-        <h3>Rise of the Centurion</h3>
-        <p>Land your <b>7th capture</b> and that dog-soldier is promoted to a <b>Centurion</b> — crowned with a
-        golden laurel and now <b>sliding across the whole board</b> like a chess rook. The midgame is never
-        boring again: every match becomes a race to forge your Centurion and hunt the rival's.
-        <span class="hl">Earn it. Fear losing it.</span> 🐶👑</p>
+        <h3>Rise of the Centurion 👑</h3>
+        <p>Land your <b>7th capture</b> and that dog-soldier is crowned a <b>Centurion</b> — now it <b>slides
+        across the whole board</b> like a chess rook. The midgame is never boring again: every match is a race
+        to forge your Centurion and hunt the rival's. <span class="hl">Earn it. Fear losing it.</span></p>
       </div>
     </div>
 
