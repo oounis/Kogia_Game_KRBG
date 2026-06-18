@@ -38,22 +38,25 @@ But this repository has **one focus**: ship **Kharbga: Origins** — first as a 
 
 ---
 
-## 📁 Repository structure
+## 📁 Repository structure (full product architecture)
 ```
 Kogia_Game_KRBG/
-├── README.md                  ← you are here
-├── docs/
-│   ├── 01-research/           ← historical research (sourced)
-│   │   ├── history.md
-│   │   └── regional-variations.md
-│   ├── 02-business/
-│   │   └── roadmap-and-architecture.md
-│   └── 03-game-design/
-│       └── rules.md           ← the AUTHORITATIVE rule spec (build the engine from this)
-├── web/                       ← the website (Phase 1)
-└── game/                      ← the playable game (Phase 2)
+├── 00-Corporate/        Kogia Group brand/vision (Edu & Biz = separate future repos)
+├── 01-Research/         ✅ sourced history + regional variations
+├── 02-Business/         ✅ roadmap & architecture decisions
+├── 03-GameDesign/       ✅ rules.md (authoritative spec)
+├── 04-UXUI/             wireframes, branding, design system
+├── 05-Development/      the code — TS+Canvas game, Capacitor mobile
+├── 06-Testing/          functional, performance, UAT
+├── 07-Marketing/        social, press kit, store assets
+├── 08-Website/          🎯 Phase 1 — the official site (code lives here)
+├── 09-MobileApps/       Android · iOS · Huawei store builds
+├── 10-Operations/       releases, analytics, backups
+├── 11-History/          cultural-preservation project (our differentiator)
+└── 12-Innovation-Lab/   🔬 game-design experiments (Classic vs Origins mode)
 ```
-*(Folders are added when they have real content — no empty scaffolding.)*
+> Full architecture applied as planned. Folders carry a README documenting intent; each is **filled in its phase**
+> (we don't pre-fill with nothing). Seeded so far: 01, 02, 03, and the active 12-Innovation-Lab.
 
 ---
 
