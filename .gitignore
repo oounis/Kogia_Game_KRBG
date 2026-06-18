@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+.pnp/
+# Build output
+dist/
+build/
+.next/
+out/
+# Mobile (Capacitor) native shells — generated
+android/
+ios/
+# Env & secrets
+.env
+.env.*
+*.local
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+# Backups / temp
+*.bak
+*.bak-*
+~$*
