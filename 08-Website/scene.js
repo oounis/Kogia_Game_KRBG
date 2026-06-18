@@ -1,5 +1,5 @@
-// Kharbga: Origins — 3D live match (Three.js)
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+// Kharbga: Origins — 3D live match (Three.js, local UMD global build)
+/* global THREE */
 
 const canvas   = document.getElementById('scene3d');
 const capEl    = document.getElementById('matchCap');
@@ -198,6 +198,7 @@ function loop() {
 
 try {
   if (!canvas) throw new Error('no canvas');
+  if (typeof THREE === 'undefined') throw new Error('THREE not loaded');
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
