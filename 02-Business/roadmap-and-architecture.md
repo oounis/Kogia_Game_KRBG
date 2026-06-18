@@ -35,7 +35,7 @@ Repo, sourced research, authoritative rules spec, brand direction.
 
 ### Phase 4 — Online (only when single-player is solid)
 - **Supabase** = Postgres + auth + realtime + storage on a free tier.
-- Features: accounts, online multiplayer, global leaderboard, ranking ladder (The Kid → Sheikh of Tataouine).
+- Features: accounts, online multiplayer, global leaderboard, ranking ladder (The Kid -> The Emperor).
 
 ### Phase 5 — Expand
 - More AI levels, **Fog Mode**, heritage board/piece themes (date-seed, shell, stone), then the next traditional game.
