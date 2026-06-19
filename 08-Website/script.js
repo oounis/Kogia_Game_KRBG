@@ -5,12 +5,14 @@
   function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
   function pulse(el,cls){ if(!el)return; el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
 
-  // ---- starfield ----
-  var stars=$('stars');
-  if(stars){ var n=window.innerWidth<700?28:56;
-    for(var i=0;i<n;i++){ var s=document.createElement('i');
-      s.style.left=(Math.random()*100)+'%'; s.style.top=(Math.random()*100)+'%';
-      s.style.animationDelay=(Math.random()*3)+'s'; stars.appendChild(s); } }
+  // ---- floating gems ----
+  var fl=$('floaties');
+  if(fl){ var n=window.innerWidth<700?10:18;
+    for(var i=0;i<n;i++){ var g=document.createElement('span'); g.className='gem';
+      var sz=(8+Math.random()*16); g.style.width=g.style.height=sz+'px';
+      g.style.left=(Math.random()*100)+'%'; g.style.top=(Math.random()*100)+'%';
+      g.style.animationDelay=(-Math.random()*9)+'s'; g.style.opacity=(0.22+Math.random()*0.4);
+      fl.appendChild(g); } }
 
   // ---- nav solid on scroll ----
   var nav=$('nav'); function onScroll(){ nav.classList.toggle('solid', window.scrollY>40); }

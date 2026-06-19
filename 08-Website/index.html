@@ -4,157 +4,145 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kharbga: Origins — Older Than Chess. Pure Skill. Play Free.</title>
-<meta name="description" content="Kharbga: Origins — the 2,500-year-old desert strategy game, reborn. Chain captures into epic combos, promote a Soldier to a Centurion, and out-think your rival. No luck — pure skill. Download free.">
+<meta name="description" content="Kharbga: Origins — a 2,500-year-old strategy game reborn. Chain dazzling combos, crown your Centurion, outsmart everyone. Pure skill, zero luck. Download free.">
 <meta property="og:title" content="Kharbga: Origins — Older Than Chess">
-<meta property="og:description" content="Chain captures into combos. Promote your Centurion. Pure skill, no luck. Download free.">
-<meta property="og:type" content="website">
-<meta name="theme-color" content="#fff6e6">
+<meta property="og:description" content="Chain combos. Crown your Centurion. Pure skill, zero luck. Download free.">
+<meta name="theme-color" content="#1a0f3d">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- animated background -->
-<div class="bg"><div class="bg-glow g1"></div><div class="bg-glow g2"></div><div class="stars" id="stars"></div></div>
-
-<!-- pieces are emoji avatars, rendered in JS -->
+<!-- animated aurora background -->
+<div class="aurora">
+  <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span><span class="blob b4"></span>
+  <div class="grain"></div>
+</div>
+<!-- floating gems -->
+<div class="floaties" id="floaties"></div>
 
 <!-- NAV -->
-<header class="nav" id="nav">
-  <a href="#top" class="logo">KHARBGA<span>: ORIGINS</span></a>
+<header class="nav glass" id="nav">
+  <a href="#top" class="logo">◆ KHARBGA</a>
   <nav class="nav-links">
-    <a href="#tricks">The Tricks</a>
-    <a href="#play">How to Play</a>
-    <a href="#story">Story</a>
+    <a href="#tricks">Tricks</a><a href="#play">How to Play</a><a href="#story">Story</a>
   </nav>
-  <a href="#download" class="btn btn-glow nav-cta">▼ Download Free</a>
+  <a href="#download" class="btn btn-cta nav-cta">Download ✨</a>
 </header>
 
 <!-- HERO -->
 <section class="hero" id="top">
   <div class="hero-inner">
-    <span class="eyebrow reveal">🐶 Kogia Games · Older than chess, way more fun</span>
+    <span class="badge reveal">◆ Kogia Games · Older than chess</span>
     <h1 class="title">
-      <span class="reveal" style="--d:.05s">KHARBGA</span>
-      <span class="title-sub reveal" style="--d:.15s">ORIGINS</span>
+      <span class="ln reveal" style="--d:.05s">PURE</span>
+      <span class="ln grad reveal" style="--d:.13s">STRATEGY</span>
+      <span class="ln reveal" style="--d:.21s">ZERO LUCK</span>
     </h1>
-    <p class="hero-sub reveal" style="--d:.25s">The 2,500-year-old desert strategy game — now a <b>fast, free, addictive</b> mobile game!
-      Chain wild <b>combos</b>, crown your <b>Centurion</b>, and outsmart your friends.
-      <span class="noluck">Pure skill. Zero luck. 100% fun.</span></p>
-    <div class="hero-cta reveal" style="--d:.35s">
-      <a href="#download" class="btn btn-glow btn-lg">▼ Download Free</a>
-      <a href="#tricks" class="btn btn-ghost btn-lg">See the Tricks →</a>
+    <p class="hero-sub reveal" style="--d:.3s">A 2,500-year-old desert duel — reimagined as a <b>fast, free, dazzling</b> mobile game.
+      Chain wild <b>combos</b>, crown your <b>Centurion</b>, and out-think the world.</p>
+    <div class="hero-cta reveal" style="--d:.38s">
+      <a href="#download" class="btn btn-cta btn-lg">▼ Download Free</a>
+      <a href="#tricks" class="btn btn-glass btn-lg">See it move →</a>
     </div>
-    <div class="stores reveal" style="--d:.45s">
-      <span class="store">  App Store <i>soon</i></span>
-      <span class="store">▶ Google Play <i>soon</i></span>
-    </div>
-    <!-- animated board -->
-    <div class="board-wrap reveal" style="--d:.5s">
-      <div class="board" id="heroBoard"></div>
-      <div class="board-cap">7×7 · The Citadel at its heart</div>
+    <div class="stores reveal" style="--d:.46s">
+      <span class="store glass"> App Store · soon</span>
+      <span class="store glass">▶ Google Play · soon</span>
     </div>
   </div>
-  <a href="#tricks" class="scroll-hint">scroll ↓</a>
 </section>
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="marquee-track">
+    <span>PURE SKILL ✦ NO LUCK ✦ OLDER THAN CHESS ✦ CHAIN COMBOS ✦ CROWN YOUR CENTURION ✦ FREE TO PLAY ✦</span>
+    <span>PURE SKILL ✦ NO LUCK ✦ OLDER THAN CHESS ✦ CHAIN COMBOS ✦ CROWN YOUR CENTURION ✦ FREE TO PLAY ✦</span>
+  </div>
+</div>
 
 <!-- TRICKS -->
 <section class="section" id="tricks">
   <div class="wrap">
-    <div class="sec-head reveal"><span class="kicker">What makes it addictive</span><h2>The New Tricks</h2>
-      <p class="sec-lead">We kept the 2,500-year-old soul — then added the moments that make you scream "one more game."</p>
+    <div class="sec-head reveal"><span class="kicker">◆ Watch it live</span><h2>See the Magic</h2>
+      <p class="sec-lead">Real 3D, real motion — gems hop, capture in dazzling combos, and rise to glory.</p>
     </div>
-
-    <!-- LIVE 3D MATCH -->
-    <div class="scene3d-wrap reveal">
-      <div class="match-top">
-        <span class="turn you">● 3D Live Match</span>
-        <span class="who"><b class="you-dot">🟡 Gold Pack</b> vs <b class="riv-dot">🟢 Teal Pack</b></span>
+    <div class="stage glass reveal">
+      <div class="stage-top">
+        <span class="pill"><span class="dot pink"></span> Pink Crew</span>
         <span class="combo-tag">Combo <b id="comboN">0</b></span>
+        <span class="pill"><span class="dot cyan"></span> Cyan Crew</span>
       </div>
       <canvas id="scene3d"></canvas>
-      <div class="scene3d-fallback" id="scene3dFallback">Loading the 3D board… (needs WebGL) 🎮</div>
-      <div class="cap" id="matchCap">Two packs, one board — watch the 3D match…</div>
+      <div class="scene3d-fallback" id="scene3dFallback">Loading the 3D arena… 🎮</div>
+      <div class="cap" id="matchCap">Two crews, one board — watch the 3D match…</div>
       <div class="combo-pop" id="comboPop"></div>
     </div>
-
-    <!-- FEATURES -->
     <div class="feat-row reveal">
-      <div class="feat">
-        <span class="trick-no">01</span>
-        <h3>Combo Captures 🥊</h3>
-        <p>Trap a rival between two of your <b>dog-soldiers</b> and it falls — then <b>keep going</b>. One piece
-        can chain three, four, five captures in a single turn: <b class="hl">DOUBLE → TRIPLE → ONSLAUGHT →
-        ANNIHILATION</b> — with screen-shake and slow-mo. A fighting-game finisher on a desert board.</p>
-      </div>
-      <div class="feat">
-        <span class="trick-no">02</span>
-        <h3>Rise of the Centurion 👑</h3>
-        <p>Land your <b>7th capture</b> and that dog-soldier is crowned a <b>Centurion</b> — now it <b>slides
-        across the whole board</b> like a chess rook. The midgame is never boring again: every match is a race
-        to forge your Centurion and hunt the rival's. <span class="hl">Earn it. Fear losing it.</span></p>
-      </div>
-    </div>
-
-    <!-- PILLARS -->
-    <div class="pillars reveal">
-      <div class="pillar"><span class="big" data-count="2500">0</span><p>Years old — older than chess itself</p></div>
-      <div class="pillar"><span class="big">0%</span><p>Luck. Every loss is on you.</p></div>
-      <div class="pillar"><span class="big">2 min</span><p>A match. Perfect for "one more."</p></div>
-      <div class="pillar"><span class="big">∞</span><p>Depth. Easy to learn, a lifetime to master.</p></div>
+      <div class="feat glass"><span class="fno">01</span><h3>⚡ Combo Captures</h3>
+        <p>Trap a gem between two of yours and it shatters — then <b>keep going</b>. Chain it:
+        <b class="hl">DOUBLE → TRIPLE → ONSLAUGHT → ANNIHILATION</b>. A fighting-game finisher on a board.</p></div>
+      <div class="feat glass"><span class="fno">02</span><h3>👑 Rise of the Centurion</h3>
+        <p>Hit your <b>7th capture</b> and a gem is crowned a <b>Centurion</b> — it glides across the whole board.
+        Every match becomes a race to forge yours and hunt theirs.</p></div>
     </div>
   </div>
 </section>
 
 <!-- HOW TO PLAY -->
-<section class="section alt" id="play">
+<section class="section" id="play">
   <div class="wrap">
-    <div class="sec-head reveal"><span class="kicker">Learn it in 20 seconds</span><h2>How to Play</h2></div>
+    <div class="sec-head reveal"><span class="kicker">◆ 20 seconds to learn</span><h2>How to Play</h2></div>
     <div class="steps">
-      <div class="step reveal"><span class="step-n">1</span><h4>Place</h4><p>Set out your Soldiers two at a time, leaving the golden Citadel empty.</p></div>
-      <div class="step reveal" style="--d:.1s"><span class="step-n">2</span><h4>Surround</h4><p>Sandwich an enemy between two of yours — up, down, left or right — and capture it.</p></div>
-      <div class="step reveal" style="--d:.2s"><span class="step-n">3</span><h4>Chain</h4><p>One capture lets the same Soldier strike again. Build the longest combo you can.</p></div>
-      <div class="step reveal" style="--d:.3s"><span class="step-n">4</span><h4>Conquer</h4><p>Forge your Centurion, trap the enemy, and win the desert.</p></div>
+      <div class="step glass reveal"><span class="step-n">1</span><h4>Place</h4><p>Set out your gems two at a time, leaving the glowing center empty.</p></div>
+      <div class="step glass reveal" style="--d:.08s"><span class="step-n">2</span><h4>Surround</h4><p>Sandwich a rival between two of yours — and capture it.</p></div>
+      <div class="step glass reveal" style="--d:.16s"><span class="step-n">3</span><h4>Chain</h4><p>One capture lets the same gem strike again. Build the longest combo.</p></div>
+      <div class="step glass reveal" style="--d:.24s"><span class="step-n">4</span><h4>Conquer</h4><p>Crown your Centurion, trap the rival, win the board.</p></div>
     </div>
-    <div class="center reveal"><a href="#download" class="btn btn-glow btn-lg">▼ Get the game free</a></div>
+    <div class="center reveal"><a href="#download" class="btn btn-cta btn-lg">▼ Get it free</a></div>
   </div>
+</section>
+
+<!-- PILLARS -->
+<section class="section" id="why">
+  <div class="wrap"><div class="pillars reveal">
+    <div class="pillar glass"><span class="big" data-count="2500">0</span><p>Years old — older than chess</p></div>
+    <div class="pillar glass"><span class="big">0%</span><p>Luck — every loss is on you</p></div>
+    <div class="pillar glass"><span class="big">2m</span><p>A match — built for "one more"</p></div>
+    <div class="pillar glass"><span class="big">∞</span><p>Depth — easy to learn, hard to master</p></div>
+  </div></div>
 </section>
 
 <!-- STORY -->
 <section class="section" id="story">
   <div class="wrap">
-    <div class="sec-head reveal"><span class="kicker">2,500 years, one game</span><h2>From Roman Legions to Your Pocket</h2></div>
+    <div class="sec-head reveal"><span class="kicker">◆ 2,500 years</span><h2>From Roman Legions to Your Pocket</h2></div>
     <div class="timeline">
-      <div class="t-item reveal"><b>530 BCE</b><p>A Greek vase shows Achilles at the board — <i>Petteia</i>, the ancestor.</p></div>
-      <div class="t-item reveal" style="--d:.1s"><b>1st c. BCE</b><p>Rome plays <i>Ludus Latrunculorum</i> — "the game of soldiers." Legionaries play it on Hadrian's Wall.</p></div>
-      <div class="t-item reveal" style="--d:.2s"><b>11th c.</b><p>Carried across North Africa, it takes root in the Tunisian south.</p></div>
-      <div class="t-item reveal" style="--d:.3s"><b>Today</b><p>Elders still draw it in the sand of Tataouine. Now reborn by <b>Kogia Games</b>.</p></div>
+      <div class="t-item glass reveal"><b>530 BCE</b><p>A Greek vase shows Achilles at the board — <i>Petteia</i>, the ancestor.</p></div>
+      <div class="t-item glass reveal" style="--d:.08s"><b>1st c. BCE</b><p>Rome plays <i>Ludus Latrunculorum</i> — "the game of soldiers."</p></div>
+      <div class="t-item glass reveal" style="--d:.16s"><b>11th c.</b><p>Carried across North Africa to the Tunisian south.</p></div>
+      <div class="t-item glass reveal" style="--d:.24s"><b>Today</b><p>Reborn by <b>Kogia Games</b> for the whole world.</p></div>
     </div>
   </div>
 </section>
 
-<!-- DOWNLOAD CTA -->
+<!-- DOWNLOAD -->
 <section class="cta" id="download">
   <div class="wrap reveal">
-    <h2>Be First to Play.</h2>
-    <p class="cta-sub">Kharbga: Origins is coming to iPhone, Android & web — <b>free</b>. Drop your email and we'll
-      send you the download the moment it's live.</p>
+    <h2 class="grad">Be First to Play.</h2>
+    <p class="cta-sub">Coming to iPhone, Android &amp; web — <b>free</b>. Drop your email, get the download the second it drops.</p>
     <form class="signup" id="signupForm">
       <input type="email" id="email" placeholder="your@email.com" required aria-label="email">
-      <button class="btn btn-glow" type="submit">Notify Me ▸</button>
+      <button class="btn btn-cta" type="submit">Notify Me ✨</button>
     </form>
     <p class="signup-msg" id="signupMsg"></p>
-    <div class="stores big">
-      <span class="store">  App Store <i>soon</i></span>
-      <span class="store">▶ Google Play <i>soon</i></span>
-    </div>
+    <div class="stores big"><span class="store glass"> App Store · soon</span><span class="store glass">▶ Google Play · soon</span></div>
   </div>
 </section>
 
 <footer class="footer">
-  <span class="logo">KHARBGA<span>: ORIGINS</span></span>
+  <span class="logo">◆ KHARBGA</span>
   <span class="muted">© 2026 Kogia Games · Older than chess · Pure skill</span>
 </footer>
 
