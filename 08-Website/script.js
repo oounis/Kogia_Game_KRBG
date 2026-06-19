@@ -142,10 +142,10 @@
     var KN=5, klayer, kstarted=false;
     function ksleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
     function kxy(el,c,r){ el.style.left=(c*(100/KN))+'%'; el.style.top=(r*(100/KN))+'%'; }
-    function ktok(side,c,r){ var e=document.createElement('div'); e.className='ktok '+side; kxy(e,c,r); klayer.appendChild(e); return {el:e,c:c,r:r}; }
+    function ktok(side,c,r){ var e=document.createElement('div'); e.className='ktok '+side; e.textContent='♟'; kxy(e,c,r); klayer.appendChild(e); return {el:e,c:c,r:r}; }
     function kmove(o,c,r){ o.c=c;o.r=r;kxy(o.el,c,r); }
     function kpulse(el,cls){ el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
-    function kboom(c,r){ var b=document.createElement('div'); b.className='kboom'; b.textContent='💥'; b.style.left=(c*(100/KN))+'%'; b.style.top=(r*(100/KN))+'%'; klayer.appendChild(b); setTimeout(function(){b.remove();},560); }
+    function kboom(c,r){ var b=document.createElement('div'); b.className='kboom'; b.textContent='⚔️'; b.style.left=(c*(100/KN))+'%'; b.style.top=(r*(100/KN))+'%'; klayer.appendChild(b); setTimeout(function(){b.remove();},560); }
     function kcapS(t){ if(!kcap)return; kcap.style.opacity=0; setTimeout(function(){kcap.textContent=t;kcap.style.opacity=1;},150); }
     function kpopS(t){ kpop.textContent=t; kpulse(kpop,'show'); }
     function kbuild(){ kb.innerHTML=''; for(var i=0;i<KN*KN;i++){ var cl=document.createElement('div'); cl.className='kcell'; if(i===12)cl.classList.add('mid'); kb.appendChild(cl);} klayer=document.createElement('div'); klayer.className='klayer'; kb.appendChild(klayer); }
@@ -157,11 +157,11 @@
       var m=ktok('terra',1,0); if(kcombo)kcombo.textContent='0';
       kcapS('Two armies face off — your move…'); await ksleep(1200);
       kcapS('March into the Citadel and surround them!'); kmove(m,2,2); await ksleep(640);
-      var words=['','','DOUBLE!','TRIPLE!','ONSLAUGHT!','ANNIHILATION!'], targets=[t1,t2,t3,t4], hits=0;
+      var words=['','','II · DUO!','III · TRES!','IV · QUATTUOR!','V · LEGIO!'], targets=[t1,t2,t3,t4], hits=0;
       for(var i=0;i<targets.length;i++){ kpulse(m.el,'chomp'); var tg=targets[i]; kboom(tg.c,tg.r); tg.el.classList.add('gone');
         hits++; if(kcombo)kcombo.textContent=hits; kpulse(kb,'shake');
-        if(hits>=2) kpopS(words[Math.min(hits,5)]); kcapS(hits===1?'CAPTURE! ⚔️':'Combo x'+hits+'!'); await ksleep(650); }
-      await ksleep(520); kcapS('7 captures — crown your Centurion!'); m.el.classList.add('king'); kpopS('CENTURION! 👑'); kpulse(kb,'shake'); await ksleep(1500);
+        if(hits>=2) kpopS(words[Math.min(hits,5)]); kcapS(hits===1?'STRIKE! ⚔️':'Combo '+hits+'!'); await ksleep(650); }
+      await ksleep(520); kcapS('Seven kills — promote to Centurion!'); m.el.textContent='♛'; m.el.classList.add('king'); kpopS('VICTORIA! 👑'); kpulse(kb,'shake'); await ksleep(1500);
       kcapS('The Centurion marches across the board!'); kmove(m,3,2); await ksleep(560); kmove(m,1,2); await ksleep(650); kmove(m,2,2); await ksleep(650);
       kcapS('Your turn — fancy one more? ⚔️'); await ksleep(1500); kplay();
     }
