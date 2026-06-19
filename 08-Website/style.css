@@ -162,4 +162,26 @@ h1,h2,h3,h4,.logo,.title,.kicker,.big,.t-item b,.combo-pop,.marquee,.spec b{font
 .show-dots i{width:9px;height:9px;border-radius:50%;background:rgba(255,248,236,.45);cursor:pointer;transition:.3s}
 .show-dots i.on{background:#ffd089;width:24px;border-radius:5px}
 
+/* flat warm top-down combo board */
+.kboard{position:relative;width:min(440px,86vw);aspect-ratio:1;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:0;padding:12px;
+  border-radius:18px;background:linear-gradient(150deg,#ead09b,#dcb87a 60%,#d0a866);border:5px solid #fff9ef;
+  box-shadow:inset 0 0 50px rgba(150,100,40,.22),0 18px 44px rgba(44,29,14,.22)}
+.kcell{border:1px solid rgba(120,80,30,.16)}
+.kcell.mid{background:radial-gradient(circle,rgba(221,159,44,.55),transparent 72%);box-shadow:inset 0 0 16px rgba(221,159,44,.5)}
+.klayer{position:absolute;inset:12px;pointer-events:none}
+.ktok{position:absolute;width:20%;height:20%;display:grid;place-items:center;
+  transition:left .42s cubic-bezier(.34,1.28,.5,1),top .42s cubic-bezier(.34,1.28,.5,1),transform .22s}
+.ktok::before{content:"";width:74%;height:74%;border-radius:50%}
+.ktok.terra::before{background:radial-gradient(circle at 38% 30%,#e89460,#a8431f);box-shadow:0 4px 7px rgba(0,0,0,.32),inset 0 3px 5px rgba(255,255,255,.45),inset 0 -5px 7px rgba(80,20,0,.3)}
+.ktok.slate::before{background:radial-gradient(circle at 38% 30%,#a6b3bd,#566570);box-shadow:0 4px 7px rgba(0,0,0,.32),inset 0 3px 5px rgba(255,255,255,.5),inset 0 -5px 7px rgba(20,30,40,.3)}
+.ktok.chomp{animation:kchomp .26s}
+@keyframes kchomp{0%,100%{transform:scale(1)}45%{transform:scale(1.22) rotate(-7deg)}}
+.ktok.gone{animation:kgone .45s forwards}
+@keyframes kgone{to{transform:scale(.1) rotate(220deg);opacity:0}}
+.ktok.king::before{box-shadow:0 0 16px var(--gold),0 4px 7px rgba(0,0,0,.32),inset 0 3px 5px rgba(255,255,255,.55)}
+.ktok.king::after{content:"👑";position:absolute;top:-34%;font-size:.78em;animation:kcrown .55s}
+@keyframes kcrown{0%{transform:translateY(-14px) scale(0)}60%{transform:translateY(2px) scale(1.2)}100%{transform:translateY(0) scale(1)}}
+.kboom{position:absolute;width:20%;height:20%;display:grid;place-items:center;line-height:1;font-size:clamp(22px,5.5vw,38px);pointer-events:none;animation:kboomA .55s forwards}
+@keyframes kboomA{0%{transform:scale(.4);opacity:0}30%{opacity:1;transform:scale(1.15)}100%{opacity:0;transform:scale(1.6)}}
+
 @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none}.kenburns,.mtrack,.dust i,.slide.active{animation:none}}
