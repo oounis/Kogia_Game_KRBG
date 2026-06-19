@@ -115,6 +115,27 @@
     bio.observe(board);
   }
 
+  // ---- cinematic art showcase ----
+  var slides=document.querySelectorAll('.slide'), capBox=$('showCap'),
+      sk=$('showKicker'), st=$('showTitle'), sx=$('showText'), dotsBox=$('showDots');
+  if(slides.length && capBox){
+    var SC=[
+      {k:'◆ The Board',  t:'Pure Skill, Zero Luck',  x:'Place, move and surround — no dice, no cards. Just the sharper mind wins.'},
+      {k:'◆ Combos',     t:'Chain Dazzling Combos',  x:'One warrior can capture three, four, five in a row — DOUBLE, TRIPLE, ANNIHILATION!'},
+      {k:'◆ The Centurion', t:'Crown Your Champion', x:'Seven captures and your warrior becomes a Centurion that rules the whole board.'}
+    ];
+    var idx=0, dots=[];
+    for(var i=0;i<slides.length;i++){ (function(j){ var d=document.createElement('i'); if(j===0)d.className='on';
+      d.addEventListener('click',function(){ go(j); }); dotsBox.appendChild(d); dots.push(d); })(i); }
+    function go(n){ idx=n;
+      slides.forEach(function(s,k){ s.classList.toggle('active',k===idx); });
+      dots.forEach(function(d,k){ d.classList.toggle('on',k===idx); });
+      var c=SC[idx]||SC[0]; if(sk)sk.textContent=c.k; if(st)st.textContent=c.t; if(sx)sx.textContent=c.x;
+      capBox.classList.remove('swap'); void capBox.offsetWidth; capBox.classList.add('swap');
+    }
+    go(0); setInterval(function(){ go((idx+1)%slides.length); }, 4200);
+  }
+
   // ---- email signup (stub; wire to a real service later) ----
   var form=$('signupForm'), msg=$('signupMsg');
   if(form){ form.addEventListener('submit', function(ev){ ev.preventDefault();
