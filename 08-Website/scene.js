@@ -13,8 +13,8 @@ function pop(t){ if(!popEl) return; popEl.textContent = t; popEl.classList.remov
 
 const N = 5, TILE = 1.25, REST_Y = 0.55;
 const TEAMS = {
-  pink: { color: 0xff4d8d, emissive: 0xff1f6e, glow: 0xff6fa6 },
-  cyan: { color: 0x37e0ff, emissive: 0x10b9e6, glow: 0x77ecff }
+  pink: { color: 0xe6a73e, emissive: 0xd98a1e, glow: 0xffd089 },   // warm gold crew
+  cyan: { color: 0x5f8c98, emissive: 0x3d6b78, glow: 0x9ec7d2 }    // slate crew
 };
 const tileToWorld = (c, r) => ({ x: (c - (N - 1) / 2) * TILE, z: (r - (N - 1) / 2) * TILE });
 
@@ -39,16 +39,16 @@ function buildBoard() {
   boardGroup = new THREE.Group(); scene.add(boardGroup);
   const span = N * TILE;
   const frame = new THREE.Mesh(new THREE.BoxGeometry(span + 0.9, 0.4, span + 0.9),
-    new THREE.MeshStandardMaterial({ color: 0x3a2270, roughness: 0.4, metalness: 0.2 }));
+    new THREE.MeshStandardMaterial({ color: 0xc9a86a, roughness: 0.7, metalness: 0.05 }));
   frame.position.y = -0.42; frame.receiveShadow = true; boardGroup.add(frame);
   const base = new THREE.Mesh(new THREE.BoxGeometry(span + 0.4, 0.4, span + 0.4),
-    new THREE.MeshStandardMaterial({ color: 0x2a1654, roughness: 0.5, metalness: 0.15 }));
+    new THREE.MeshStandardMaterial({ color: 0xb98f50, roughness: 0.8, metalness: 0.04 }));
   base.position.y = -0.18; base.receiveShadow = true; boardGroup.add(base);
   for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
     const isMid = (c === (N - 1) / 2 && r === (N - 1) / 2);
-    const col = isMid ? 0x5a2a8a : ((c + r) % 2 ? 0x3c2570 : 0x301d5a);
-    const m = new THREE.MeshStandardMaterial({ color: col, roughness: 0.45, metalness: 0.1,
-      emissive: isMid ? 0xff4d8d : 0x140a2a, emissiveIntensity: isMid ? 0.5 : 0.15 });
+    const col = isMid ? 0xf0d49a : ((c + r) % 2 ? 0xecd1a0 : 0xdcb87a);
+    const m = new THREE.MeshStandardMaterial({ color: col, roughness: 0.7, metalness: 0.04,
+      emissive: isMid ? 0xdd9f2c : 0x000000, emissiveIntensity: isMid ? 0.4 : 0 });
     const t = new THREE.Mesh(new THREE.BoxGeometry(TILE * 0.9, 0.12, TILE * 0.9), m);
     const w = tileToWorld(c, r); t.position.set(w.x, 0.06, w.z); t.receiveShadow = true; boardGroup.add(t);
   }
@@ -175,14 +175,15 @@ try {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100); camera.position.copy(camBase); camera.lookAt(camLook);
 
-  scene.add(new THREE.AmbientLight(0x6a5a9a, 0.6));
-  const key = new THREE.DirectionalLight(0xffffff, 0.85); key.position.set(4, 9, 5); key.castShadow = true;
+  scene.add(new THREE.AmbientLight(0xfff1d8, 0.6));
+  scene.add(new THREE.HemisphereLight(0xfff3e0, 0xc9a86a, 0.5));
+  const key = new THREE.DirectionalLight(0xfff4e2, 0.95); key.position.set(4, 9, 5); key.castShadow = true;
   key.shadow.mapSize.set(1024, 1024); key.shadow.radius = 4; key.shadow.bias = -0.0006;
   key.shadow.camera.near = 1; key.shadow.camera.far = 36;
   key.shadow.camera.left = -7; key.shadow.camera.right = 7; key.shadow.camera.top = 7; key.shadow.camera.bottom = -7;
   scene.add(key);
-  const pl1 = new THREE.PointLight(0xff4d8d, 0.7, 24); pl1.position.set(-5, 4, 3); scene.add(pl1);
-  const pl2 = new THREE.PointLight(0x37e0ff, 0.7, 24); pl2.position.set(5, 4, -3); scene.add(pl2);
+  const pl1 = new THREE.PointLight(0xffd089, 0.5, 24); pl1.position.set(-5, 4, 3); scene.add(pl1);
+  const pl2 = new THREE.PointLight(0xffb060, 0.4, 24); pl2.position.set(5, 4, -3); scene.add(pl2);
 
   clock = new THREE.Clock();
   buildBoard();
