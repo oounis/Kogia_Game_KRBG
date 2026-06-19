@@ -69,21 +69,15 @@
 <!-- TRICKS / 3D demo -->
 <section class="section alt" id="tricks">
   <div class="wrap">
-    <div class="sec-head reveal"><span class="kicker">◆ A glimpse of the world</span><h2>See the Magic</h2>
-      <p class="sec-lead">The board, the warriors, the arena — a 2,500-year-old battle, reborn.</p></div>
-    <div class="showcase reveal">
-      <div class="slides">
-        <div class="slide active" style="background-image:url('img/board.jpg')"></div>
-        <div class="slide" style="background-image:url('img/soldier.jpg')"></div>
-        <div class="slide" style="background-image:url('img/arena.jpg')"></div>
-      </div>
-      <div class="show-veil"></div>
-      <div class="show-dots" id="showDots"></div>
-      <div class="show-cap" id="showCap">
-        <span class="show-kicker" id="showKicker">◆ The Board</span>
-        <h3 id="showTitle">Pure Skill, Zero Luck</h3>
-        <p id="showText">Place, move and surround — no dice, no cards. Just the sharper mind.</p>
-      </div>
+    <div class="sec-head reveal"><span class="kicker">◆ Watch it live</span><h2>See the Magic</h2>
+      <p class="sec-lead">Real 3D motion — Roman warriors march, capture in dazzling combos, and rise to glory.</p></div>
+    <div class="stage reveal">
+      <div class="stage-top"><span class="pill"><span class="dot gold"></span> Terracotta</span>
+        <span class="combo-tag">Combo <b id="comboN">0</b></span><span class="pill"><span class="dot teal"></span> Slate</span></div>
+      <canvas id="scene3d"></canvas>
+      <div class="scene3d-fallback" id="scene3dFallback">Loading the board… 🎮</div>
+      <div class="cap" id="matchCap">Two armies, one board — watch the combo…</div>
+      <div class="combo-pop" id="comboPop"></div>
     </div>
     <div class="feat-row reveal">
       <div class="feat"><span class="fno">01</span><h3>⚡ Combo Captures</h3><p>Trap a rival between two of yours and it shatters — then <b>keep going</b>. Chain it:
@@ -147,5 +141,7 @@
 <footer class="footer"><span class="logo">◆ KHARBGA</span><span class="muted">© 2026 Kogia Games · Older than chess · Pure skill</span></footer>
 
 <script src="script.js"></script>
+<script src="vendor/three.min.js"></script>
+<script src="scene.js"></script>
 </body>
 </html>
