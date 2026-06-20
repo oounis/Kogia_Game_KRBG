@@ -13,6 +13,7 @@
 
   // ---------- RULES ENGINE (pure) ----------
   function moveTargets(b,i){ var v=b[i]; if(!v)return []; var p=cc(i),o=[];
+    if(firstMove){ if((i===17||i===23||i===25||i===31)&&!b[24])return [24]; return []; }
     if(isCent(v)){ for(var k=0;k<4;k++){ var c=p[0]+DIRS[k][0],r=p[1]+DIRS[k][1]; while(inB(c,r)&&!b[idx(c,r)]){ o.push(idx(c,r)); c+=DIRS[k][0]; r+=DIRS[k][1]; } } }
     else { for(var k2=0;k2<4;k2++){ var c2=p[0]+DIRS[k2][0],r2=p[1]+DIRS[k2][1]; if(inB(c2,r2)&&!b[idx(c2,r2)])o.push(idx(c2,r2)); } }
     return o; }
@@ -46,12 +47,13 @@
   // ---------- UI STATE ----------
   var cells, turn, mode='cpu', diff=2, selected=null, chaining=null, over=false, busy=false;
   var youCap=0, cpuCap=0, centYou=false, centCpu=false, turnCaps=0, lastFrom=-1, lastTo=-1, history=[];
+  var phase='placement', youPlaced=0, cpuPlaced=0, turnPlaced=0, firstMove=true;
   var boardEl=$('board'), cellEls=[];
   function setup(){ cells=new Array(49).fill(null);
-    for(var r=0;r<N;r++)for(var c=0;c<N;c++){ if(c===3&&r===3)continue; cells[idx(c,r)]= r<3?'cpu':r>3?'you':(c<3?'cpu':'you'); }
-    turn='you'; selected=null; chaining=null; over=false; busy=false; youCap=0; cpuCap=0; centYou=false; centCpu=false; turnCaps=0; lastFrom=-1; lastTo=-1; history=[]; }
-  function snap(){ history.push({b:clone(cells),t:turn,yc:youCap,cc:cpuCap,cy:centYou,cp:centCpu}); }
-  function restore(s){ cells=clone(s.b); turn=s.t; youCap=s.yc; cpuCap=s.cc; centYou=s.cy; centCpu=s.cp; selected=null; chaining=null; over=false; busy=false; lastFrom=-1; lastTo=-1; }
+    phase='placement'; turn='you'; youPlaced=0; cpuPlaced=0; turnPlaced=0; firstMove=true;
+    selected=null; chaining=null; over=false; busy=false; youCap=0; cpuCap=0; centYou=false; centCpu=false; turnCaps=0; lastFrom=-1; lastTo=-1; history=[]; }
+  function snap(){ history.push({b:clone(cells),t:turn,yc:youCap,cc:cpuCap,cy:centYou,cp:centCpu,ph:phase,yp:youPlaced,cpP:cpuPlaced,tp:turnPlaced,fm:firstMove}); }
+  function restore(s){ cells=clone(s.b); turn=s.t; youCap=s.yc; cpuCap=s.cc; centYou=s.cy; centCpu=s.cp; phase=s.ph; youPlaced=s.yp; cpuPlaced=s.cpP; turnPlaced=s.tp; firstMove=s.fm; selected=null; chaining=null; over=false; busy=false; lastFrom=-1; lastTo=-1; }
 
   function build(){ boardEl.innerHTML=''; cellEls=[];
     for(var i=0;i<49;i++){ var p=cc(i); var d=document.createElement('div');
@@ -69,16 +71,35 @@
     if(hi!=null){ cellEls[hi].classList.add('sel'); var tg=chaining!=null?chainTargets(cells,chaining):moveTargets(cells,selected);
       for(var t=0;t<tg.length;t++){ cellEls[tg[t]].classList.add('legal'); var c2=clone(cells); if(applyStep(c2,hi,tg[t]).length)cellEls[tg[t]].classList.add('take'); } }
     // movable hint
-    var myTurn = !over&&!busy&&selected==null&&chaining==null&&(mode==='pvp'||turn==='you');
+    var myTurn = (phase==='play')&&!over&&!busy&&selected==null&&chaining==null&&(mode==='pvp'||turn==='you');
     for(var m=0;m<cells.length;m++){ var p2=cellEls[m].querySelector('.pc'); if(p2){ p2.classList.toggle('can', myTurn&&side(cells[m])===turn&&moveTargets(cells,m).length>0); } }
     hud(); }
   function hud(){ $('youCap').textContent=youCap; $('cpuCap').textContent=cpuCap; if(over)return;
-    $('status').textContent = mode==='pvp' ? (turn==='you'?'Light to move':'Dark to move') : (busy?'Enemy is thinking…':'Your move'); }
+    var hintEl = document.querySelector('.hint');
+    if(phase==='placement'){
+      var leftYou=24-youPlaced, leftCpu=24-cpuPlaced;
+      if(mode==='pvp'){
+        var pName=turn==='you'?'Light':'Dark';
+        $('status').textContent=pName+': Place '+(2-turnPlaced)+' soldier(s) ('+(turn==='you'?leftYou:leftCpu)+' left)';
+      }else{
+        if(turn==='you')$('status').textContent='Place '+(2-turnPlaced)+' soldier(s) ('+leftYou+' left)';
+        else $('status').textContent='Enemy is placing soldiers…';
+      }
+      if(hintEl) hintEl.innerHTML="<b>Placement Phase:</b> Alternate placing 2 soldiers at a time on any empty cell. The center Citadel must stay empty. Once all 48 soldiers are placed, the play phase starts!";
+    }else{
+      $('status').textContent = mode==='pvp' ? (turn==='you'?'Light to move':'Dark to move') : (busy?'Enemy is thinking…':'Your move');
+      if(hintEl){
+        if(firstMove) hintEl.innerHTML="<b>First Move:</b> Light (You) must move a soldier adjacent to the Citadel into the Citadel to open the board.";
+        else hintEl.innerHTML="Glowing soldiers can move. Tap one, then tap a highlighted square. Trap an enemy between two of yours to capture — <b>keep capturing</b> for a combo. Reach <b>7 captures</b> and that soldier becomes a <b>Centurion 👑</b>.";
+      }
+    }
+  }
   function pop(txt,big){ var el=$('boardPop'); if(!el)return; el.textContent=txt; el.className='board-pop'+(big?' big':''); void el.offsetWidth; el.classList.add('show'); }
 
   // ---------- moves ----------
   var COMBO=['','','DOUBLE!','TRIPLE!','ONSLAUGHT!','ANNIHILATION!'];
   function step(from,to){ var caps=applyStep(cells,from,to); if(turn==='you')youCap+=caps.length; else cpuCap+=caps.length;
+    if(firstMove)firstMove=false;
     if(caps.length){ turnCaps+=caps.length; if(turnCaps>=2) pop(COMBO[Math.min(turnCaps,5)]); }
     lastFrom=from; lastTo=to; beep(caps.length?'cap':'move'); render(caps,to); return caps; }
   function maybePromote(){ // 7 captures -> Centurion (the piece that just moved)
@@ -100,8 +121,42 @@
       var st=t.steps[s++]; turn='cpu'; step(st[0],st[1]); setTimeout(next,420); })(); }
   function win(msg){ over=true; selected=null; chaining=null; render(); $('status').textContent=msg; var m=$('modal'); if(m){ $('modalMsg').textContent=msg; m.classList.add('show'); } beep('win'); }
 
+  function aiPlace(){
+    var empty=[]; for(var i=0;i<49;i++){ if(i!==24&&!cells[i])empty.push(i); }
+    if(empty.length>=2){
+      var idx1=Math.floor(Math.random()*empty.length); var cell1=empty[idx1]; empty.splice(idx1,1);
+      var idx2=Math.floor(Math.random()*empty.length); var cell2=empty[idx2];
+      cells[cell1]='cpu'; cells[cell2]='cpu'; cpuPlaced+=2; beep('move'); render();
+    }
+    turnPlaced=0;
+    if(youPlaced+cpuPlaced===48){
+      phase='play'; turn='you'; firstMove=true; pop('PLAY PHASE! ⚔️',true);
+    } else {
+      turn='you';
+    }
+    busy=false; snap(); render();
+  }
+
   function onClick(e){ if(over||busy)return; var i=parseInt(e.currentTarget.getAttribute('data-i'),10);
     if(mode==='cpu'&&turn!=='you')return;
+    if(phase==='placement'){
+      if(i===24||cells[i])return;
+      cells[i]=turn; turnPlaced++;
+      if(turn==='you')youPlaced++; else cpuPlaced++;
+      beep('move'); render();
+      if(turnPlaced===2){
+        turnPlaced=0;
+        if(youPlaced+cpuPlaced===48){
+          phase='play'; turn='you'; firstMove=true; pop('PLAY PHASE! ⚔️',true); snap(); render();
+        } else {
+          turn=opp(turn); snap(); render();
+          if(mode==='cpu'&&turn==='cpu'){ busy=true; hud(); setTimeout(aiPlace,420); }
+        }
+      } else {
+        snap(); render();
+      }
+      return;
+    }
     if(chaining!=null){ if(chainTargets(cells,chaining).indexOf(i)>=0) humanStep(chaining,i); return; }
     if(selected==null){ if(side(cells[i])===turn&&moveTargets(cells,i).length){ selected=i; render(); } return; }
     if(moveTargets(cells,selected).indexOf(i)>=0){ humanStep(selected,i); return; }
