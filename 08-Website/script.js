@@ -2,12 +2,20 @@
 (function(){
   'use strict';
   function $(id){return document.getElementById(id);}
-  var N=7, DIRS=[[1,0],[-1,0],[0,1],[0,-1]];
-  function idx(c,r){return r*N+c;} function cc(i){return [i%N,(i/N|0)];}
+  var N=7;
+  var DIRS=[[1,0],[-1,0],[0,1],[0,-1]];
+  var DIRS8=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
+  
+  function idx(c,r){return r*N+c;} 
+  function cc(i){return [i%N,(i/N|0)];}
   function inB(c,r){return c>=0&&c<N&&r>=0&&r<N;}
   function clone(b){return b.slice();}
-  function side(v){ return v? (v.charAt(0)==='y'?'you':'cpu') : null; }
-  function isCent(v){ return v && (v === 'youC' || v === 'cpuC'); }
+  function side(v){ 
+    if(!v) return null;
+    return v.startsWith('you') ? 'you' : 'cpu'; 
+  }
+  function isCent(v){ return v === 'youC' || v === 'cpuC'; }
+  function isWarlord(v){ return v === 'youW' || v === 'cpuW'; }
   function opp(s){ return s==='you'?'cpu':'you'; }
   function pieces(b,s){var n=0;for(var i=0;i<b.length;i++)if(side(b[i])===s)n++;return n;}
 
@@ -25,47 +33,48 @@
     return 'Soldier';
   }
 
-  // ---------- 3D CHIBI PIECE MARKUP GENERATOR ----------
+  // ---------- VECTOR PIECE GRAPHICS ----------
+  var SVGS = {
+    // Carthage Standard Soldier (Sign of Tanit)
+    you: '<svg viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><circle cx="12" cy="6" r="3"/><path d="M5 11h14"/><path d="M12 11L6 20h12Z"/></svg>',
+    
+    // Roman Standard Soldier (Laurel Wreath with Gladius)
+    cpu: '<svg viewBox="0 0 24 24" fill="none" stroke="#c5b6a7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><path d="M5 15c-1-3-1-7 2-10a7 7 0 0 1 5-2"/><path d="M19 15c1-3 1-7-2-10a7 7 0 0 0-5-2"/><path d="M12 7v11M10 16h4"/></svg>',
+    
+    // Carthage Centurion Promoted (Upgraded Tanit with sun rays / double crescent)
+    youC: '<svg viewBox="0 0 24 24" fill="none" stroke="#ffe066" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><circle cx="12" cy="5" r="2.5"/><path d="M5 9h14"/><path d="M12 9L6 17h12Z"/><path d="M3 20c5 2 13 2 18 0"/></svg>',
+    
+    // Roman Centurion Promoted (Centurion Crest Helmet)
+    cpuC: '<svg viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><path d="M8 5a4 4 0 0 1 8 0"/><path d="M5 11a7 7 0 0 0 14 0v3H5v-3z"/><path d="M12 11v6"/></svg>',
+    
+    // Carthage Warlord (Golden Crown)
+    youW: '<svg viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z" /><path d="M3 20h18" /></svg>',
+    
+    // Roman Warlord (Imperial Silver & Crimson Crown)
+    cpuW: '<svg viewBox="0 0 24 24" fill="none" stroke="#ee5253" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z" /><path d="M3 20h18" /></svg>'
+  };
+
   function createPieceElement(v, isPop) {
     var s = side(v);
-    var type = v.substring(3); // 'W' or ''
-    var cls = 'pc ' + s + (type === 'W' ? ' warlord' : (isCent(v) ? ' cent' : ''));
+    var isW = isWarlord(v);
+    var isC = isCent(v);
+    var cls = 'pc ' + s + (isW ? ' warlord' : (isC ? ' cent' : ''));
     
     var pc = document.createElement('div');
     pc.className = cls;
     pc.dataset.v = v;
     if(isPop) pc.classList.add('pop');
     
-    // Add Roman Helmet & plume
-    var helmet = document.createElement('div');
-    helmet.className = 'helmet';
-    var crest = document.createElement('div');
-    crest.className = 'crest';
-    helmet.appendChild(crest);
-    pc.appendChild(helmet);
+    var svgContent = '';
+    if (isW) {
+      svgContent = s === 'you' ? SVGS.youW : SVGS.cpuW;
+    } else if (isC) {
+      svgContent = s === 'you' ? SVGS.youC : SVGS.cpuC;
+    } else {
+      svgContent = s === 'you' ? SVGS.you : SVGS.cpu;
+    }
     
-    // Add Chibi Face (eyes & smile)
-    var face = document.createElement('div');
-    face.className = 'face';
-    var eyes = document.createElement('div');
-    eyes.className = 'eyes';
-    var eyeL = document.createElement('div');
-    eyeL.className = 'eye l';
-    var eyeR = document.createElement('div');
-    eyeR.className = 'eye r';
-    eyes.appendChild(eyeL);
-    eyes.appendChild(eyeR);
-    face.appendChild(eyes);
-    var smile = document.createElement('div');
-    smile.className = 'smile';
-    face.appendChild(smile);
-    pc.appendChild(face);
-    
-    // Add tiny round shield
-    var shield = document.createElement('div');
-    shield.className = 'shield';
-    pc.appendChild(shield);
-    
+    pc.innerHTML = svgContent;
     return pc;
   }
 
@@ -114,58 +123,146 @@
   }
 
   // ---------- RULES ENGINE (pure) ----------
-  function moveTargets(b,i){ var v=b[i]; if(!v)return []; var p=cc(i),o=[];
-    if(firstMove){ if((i===17||i===23||i===25||i===31)&&!b[24])return [24]; return []; }
-    if(v==='youW'||v==='cpuW'){
-      var s = side(v);
-      for(var k=0;k<4;k++){
-        var c=p[0]+DIRS[k][0],r=p[1]+DIRS[k][1];
-        while(inB(c,r)){
-          var target = b[idx(c,r)];
-          if(!target){ o.push(idx(c,r)); }
-          else {
-            if(side(target)!==s){ o.push(idx(c,r)); }
-            break;
+  function moveTargets(b,i){ 
+    var v=b[i]; 
+    if(!v)return []; 
+    var p=cc(i),o=[];
+    var s=side(v);
+
+    if(firstMove){ 
+      if((i===17||i===23||i===25||i===31)&&!b[24])return [24]; 
+      return []; 
+    }
+
+    if(isWarlord(v)){
+      // Warlord: 1-step move in all 8 directions OR leap capture in all 8 directions
+      for(var k=0; k<8; k++){
+        var dx=DIRS8[k][0], dy=DIRS8[k][1];
+        var c1=p[0]+dx, r1=p[1]+dy;
+        if(inB(c1,r1)){
+          var t1=b[idx(c1,r1)];
+          if(!t1){
+            o.push(idx(c1,r1));
+          } else {
+            var c2=p[0]+2*dx, r2=p[1]+2*dy;
+            if(inB(c2,r2) && !b[idx(c2,r2)]){
+              o.push(idx(c2,r2));
+            }
           }
-          c+=DIRS[k][0]; r+=DIRS[k][1];
         }
       }
       return o;
     }
-    if(isCent(v)){ for(var k=0;k<4;k++){ var c=p[0]+DIRS[k][0],r=p[1]+DIRS[k][1]; while(inB(c,r)&&!b[idx(c,r)]){ o.push(idx(c,r)); c+=DIRS[k][0]; r+=DIRS[k][1]; } } }
-    else { for(var k2=0;k2<4;k2++){ var c2=p[0]+DIRS[k2][0],r2=p[1]+DIRS[k2][1]; if(inB(c2,r2)&&!b[idx(c2,r2)])o.push(idx(c2,r2)); } }
-    return o; }
 
-  function applyStep(b,from,to){ var v=b[from],s=side(v);
-    var target = b[to];
+    if(isCent(v)){ 
+      for(var k=0;k<4;k++){ 
+        var c=p[0]+DIRS[k][0],r=p[1]+DIRS[k][1]; 
+        while(inB(c,r)&&!b[idx(c,r)]){ 
+          o.push(idx(c,r)); 
+          c+=DIRS[k][0]; 
+          r+=DIRS[k][1]; 
+        } 
+      } 
+    } else { 
+      for(var k2=0;k2<4;k2++){ 
+        var c2=p[0]+DIRS[k2][0],r2=p[1]+DIRS[k2][1]; 
+        if(inB(c2,r2)&&!b[idx(c2,r2)]) o.push(idx(c2,r2)); 
+      } 
+    }
+    return o; 
+  }
+
+  function applyStep(b,from,to){ 
+    var v=b[from], s=side(v);
     var got = [];
-    if(target && side(target) !== s) {
-      got.push(to);
+
+    b[to]=v; 
+    b[from]=null;
+    
+    if(isWarlord(v)){
+      var pFrom=cc(from);
+      var pTo=cc(to);
+      var dc=pTo[0]-pFrom[0];
+      var dr=pTo[1]-pFrom[1];
+      if(Math.abs(dc)===2 || Math.abs(dr)===2){
+        var midC=pFrom[0] + dc/2;
+        var midR=pFrom[1] + dr/2;
+        var midIdx=idx(midC, midR);
+        var midPiece=b[midIdx];
+        if(midPiece && side(midPiece)!==s){
+          got.push(midIdx);
+          b[midIdx]=null; 
+        }
+      }
     }
-    b[to]=v; b[from]=null;
+
     var p=cc(to);
-    for(var k=0;k<4;k++){ var ec=p[0]+DIRS[k][0],er=p[1]+DIRS[k][1];
-      if(inB(ec,er)){ var e=b[idx(ec,er)];
-        if(e&&side(e)!==s){ var bc=ec+DIRS[k][0],br=er+DIRS[k][1];
-          if(inB(bc,br)&&b[idx(bc,br)]&&side(b[idx(bc,br)])===s) got.push(idx(ec,er)); } } }
-    for(var g=0;g<got.length;g++){
-      if(got[g] !== to) b[got[g]]=null;
+    for(var k=0;k<4;k++){ 
+      var ec=p[0]+DIRS[k][0],er=p[1]+DIRS[k][1];
+      if(inB(ec,er)){ 
+        var e=b[idx(ec,er)];
+        if(e&&side(e)!==s){ 
+          var bc=ec+DIRS[k][0],br=er+DIRS[k][1];
+          if(inB(bc,br)&&b[idx(bc,br)]&&side(b[idx(bc,br)])===s) {
+            got.push(idx(ec,er)); 
+          }
+        } 
+      } 
     }
-    return got; }
 
-  function chainTargets(b,i){ return moveTargets(b,i).filter(function(t){ var c=clone(b); return applyStep(c,i,t).length>0; }); }
-  function genTurns(b,s){ var turns=[];
-    for(var i=0;i<b.length;i++){ if(side(b[i])!==s)continue; var mt=moveTargets(b,i);
-      for(var a=0;a<mt.length;a++){ var c=clone(b); var got=applyStep(c,i,mt[a]); var steps=[[i,mt[a]]],gained=got.length,pos=mt[a];
-        while(got.length){ var ct=chainTargets(c,pos); if(!ct.length)break; var bt=ct[0],bn=-1;
-          for(var x=0;x<ct.length;x++){var d=clone(c);var g2=applyStep(d,pos,ct[x]);if(g2.length>bn){bn=g2.length;bt=ct[x];}}
-          got=applyStep(c,pos,bt); steps.push([pos,bt]); gained+=got.length; pos=bt; }
-        turns.push({steps:steps,result:c,gained:gained}); } }
-    return turns; }
+    for(var g=0;g<got.length;g++){
+      b[got[g]]=null;
+    }
+    return got; 
+  }
 
-  // ---------- AI ----------
-  function evalB(b,me){ var o=opp(me),mp=pieces(b,me),op=pieces(b,o); if(op<=1)return 99999; if(mp<=1)return -99999;
-    return (mp-op)*100 + (genTurns(b,me).length-genTurns(b,o).length)*1.5; }
+  function chainTargets(b,i){ 
+    return moveTargets(b,i).filter(function(t){ 
+      var c=clone(b); 
+      return applyStep(c,i,t).length>0; 
+    }); 
+  }
+
+  function genTurns(b,s){ 
+    var turns=[];
+    for(var i=0;i<b.length;i++){ 
+      if(side(b[i])!==s)continue; 
+      var mt=moveTargets(b,i);
+      for(var a=0;a<mt.length;a++){ 
+        var c=clone(b); 
+        var got=applyStep(c,i,mt[a]); 
+        var steps=[[i,mt[a]]], gained=got.length, pos=mt[a];
+        while(got.length){ 
+          var ct=chainTargets(c,pos); 
+          if(!ct.length)break; 
+          var bt=ct[0],bn=-1;
+          for(var x=0;x<ct.length;x++){
+            var d=clone(c);
+            var g2=applyStep(d,pos,ct[x]);
+            if(g2.length>bn){
+              bn=g2.length;
+              bt=ct[x];
+            }
+          }
+          got=applyStep(c,pos,bt); 
+          steps.push([pos,bt]); 
+          gained+=got.length; 
+          pos=bt; 
+        }
+        turns.push({steps:steps,result:c,gained:gained}); 
+      } 
+    }
+    return turns; 
+  }
+
+  // ---------- AI minimax ----------
+  function evalB(b,me){ 
+    var o=opp(me), mp=pieces(b,me), op=pieces(b,o); 
+    if(op<=1)return 99999; 
+    if(mp<=1)return -99999;
+    return (mp-op)*100 + (genTurns(b,me).length-genTurns(b,o).length)*1.5; 
+  }
+
   function minimax(b,s,depth,a,bb,me){
     var o=opp(me);
     var myWarlord=false, opWarlord=false;
@@ -177,38 +274,176 @@
     if(!opWarlord)return 99999;
 
     if(pieces(b,'you')<=1||pieces(b,'cpu')<=1||depth===0)return evalB(b,me);
-    var turns=genTurns(b,s); if(!turns.length)return s===me?-99999:99999; var ot=opp(s);
-    if(s===me){ var best=-1e9; for(var k=0;k<turns.length;k++){ var v=minimax(turns[k].result,ot,depth-1,a,bb,me); if(v>best)best=v; if(best>a)a=best; if(a>=bb)break; } return best; }
-    var bst=1e9; for(var j=0;j<turns.length;j++){ var v2=minimax(turns[j].result,ot,depth-1,a,bb,me); if(v2<bst)bst=v2; if(bst<bb)bb=bst; if(a>=bb)break; } return bst; }
-  function aiPick(b,s,depth){ var turns=genTurns(b,s); if(!turns.length)return null;
-    for(var k=turns.length-1;k>0;k--){var j=(Math.random()*(k+1))|0;var t=turns[k];turns[k]=turns[j];turns[j]=t;}
-    var o=opp(s),best=turns[0],bs=-1e9;
-    for(var i=0;i<turns.length;i++){ var v=minimax(turns[i].result,o,depth-1,-1e9,1e9,s)+turns[i].gained*0.1; if(v>bs){bs=v;best=turns[i];} }
-    return best; }
+    var turns=genTurns(b,s); 
+    if(!turns.length)return s===me?-99999:99999; 
+    var ot=opp(s);
+    if(s===me){ 
+      var best=-1e9; 
+      for(var k=0;k<turns.length;k++){ 
+        var v=minimax(turns[k].result,ot,depth-1,a,bb,me); 
+        if(v>best)best=v; 
+        if(best>a)a=best; 
+        if(a>=bb)break; 
+      } 
+      return best; 
+    }
+    var bst=1e9; 
+    for(var j=0;j<turns.length;j++){ 
+      var v2=minimax(turns[j].result,ot,depth-1,a,bb,me); 
+      if(v2<bst)bst=v2; 
+      if(bst<bb)bb=bst; 
+      if(a>=bb)break; 
+    } 
+    return bst; 
+  }
+
+  function aiPick(b,s,depth){ 
+    var turns=genTurns(b,s); 
+    if(!turns.length)return null;
+    for(var k=turns.length-1;k>0;k--){
+      var j=(Math.random()*(k+1))|0;
+      var t=turns[k];
+      turns[k]=turns[j];
+      turns[j]=t;
+    }
+    var o=opp(s), best=turns[0], bs=-1e9;
+    for(var i=0;i<turns.length;i++){ 
+      var v=minimax(turns[i].result,o,depth-1,-1e9,1e9,s)+turns[i].gained*0.1; 
+      if(v>bs){
+        bs=v;
+        best=turns[i];
+      } 
+    }
+    return best; 
+  }
 
   // ---------- UI STATE ----------
-  var cells, turn, mode='cpu', diff=2, selected=null, chaining=null, over=false, busy=false;
+  var cells, turn, mode='cpu', playMode='direct', diff=2, selected=null, chaining=null, over=false, busy=false;
   var youCap=0, cpuCap=0, centYou=false, centCpu=false, turnCaps=0, lastFrom=-1, lastTo=-1, history=[];
-  var phase='placement', youPlaced=0, cpuPlaced=0, turnPlaced=0, firstMove=true, movesLog=[];
+  var phase='play', youPlaced=24, cpuPlaced=24, turnPlaced=0, firstMove=true, movesLog=[];
   var cpuWarlordCaptured=false, youWarlordCaptured=false;
   var boardEl=$('board'), cellEls=[];
   
-  function setup(){ cells=new Array(49).fill(null);
-    phase='placement'; turn='you'; youPlaced=0; cpuPlaced=0; turnPlaced=0; firstMove=true; movesLog=[];
-    selected=null; chaining=null; over=false; busy=false; youCap=0; cpuCap=0; centYou=false; centCpu=false; turnCaps=0; lastFrom=-1; lastTo=-1; history=[];
-    cpuWarlordCaptured=false; youWarlordCaptured=false;
-    var oppTitle = $('opponentTitle'); if(oppTitle){ oppTitle.textContent = diff === 1 ? 'EASY BOT' : (diff === 2 ? 'MEDIUM BOT' : 'EXPERT BOT'); }
-    var oppName = $('opponentName'); if(oppName){ oppName.textContent = mode === 'pvp' ? 'Player 2' : 'Centurion AI'; }
-    updateLog(); }
-  function snap(){ history.push({b:clone(cells),t:turn,yc:youCap,cc:cpuCap,cy:centYou,cp:centCpu,ph:phase,yp:youPlaced,cpP:cpuPlaced,tp:turnPlaced,fm:firstMove,ml:movesLog.slice(),cW:cpuWarlordCaptured,yW:youWarlordCaptured}); }
-  function restore(s){ cells=clone(s.b); turn=s.t; youCap=s.yc; cpuCap=s.cc; centYou=s.cy; centCpu=s.cp; phase=s.ph; youPlaced=s.yp; cpuPlaced=s.cpP; turnPlaced=s.tp; firstMove=s.fm; movesLog=s.ml.slice(); cpuWarlordCaptured=s.cW; youWarlordCaptured=s.yW; selected=null; chaining=null; over=false; busy=false; lastFrom=-1; lastTo=-1; updateLog(); }
+  function setup(){ 
+    cells=new Array(49).fill(null);
+    selected=null; 
+    chaining=null; 
+    over=false; 
+    busy=false; 
+    youCap=0; 
+    cpuCap=0; 
+    centYou=false; 
+    centCpu=false; 
+    turnCaps=0; 
+    lastFrom=-1; 
+    lastTo=-1; 
+    history=[];
+    cpuWarlordCaptured=false; 
+    youWarlordCaptured=false;
+    movesLog=[];
+    
+    var oppTitle = $('opponentTitle'); 
+    if(oppTitle){ 
+      oppTitle.textContent = diff === 1 ? 'EASY BOT' : (diff === 2 ? 'MEDIUM BOT' : 'EXPERT BOT'); 
+    }
+    var oppName = $('opponentName'); 
+    if(oppName){ 
+      oppName.textContent = mode === 'pvp' ? 'Player 2' : 'Centurion AI'; 
+    }
+    
+    if (playMode === 'direct') {
+      for(var i=0; i<49; i++){
+        if(i === 24) continue;
+        if(i < 24) {
+          cells[i] = 'cpu';
+        } else {
+          cells[i] = 'you';
+        }
+      }
+      cells[3] = 'cpuW';  
+      cells[45] = 'youW'; 
+      
+      phase = 'play';
+      youPlaced = 24;
+      cpuPlaced = 24;
+      turnPlaced = 0;
+      firstMove = true;
+      turn = 'you';
+      addLog('⚡ Direct Play initiated. Warlords stationed at back ranks.');
+    } else {
+      phase = 'placement';
+      youPlaced = 0;
+      cpuPlaced = 0;
+      turnPlaced = 0;
+      firstMove = true;
+      turn = 'you';
+      addLog('♟ Draft Mode initiated. Alternate placing pieces.');
+    }
+    
+    updateLog(); 
+  }
 
-  function build(){ boardEl.innerHTML=''; cellEls=[];
-    for(var i=0;i<49;i++){ var p=cc(i); var d=document.createElement('div');
+  function snap(){ 
+    history.push({
+      b:clone(cells),
+      t:turn,
+      yc:youCap,
+      cc:cpuCap,
+      cy:centYou,
+      cp:centCpu,
+      ph:phase,
+      yp:youPlaced,
+      cpP:cpuPlaced,
+      tp:turnPlaced,
+      fm:firstMove,
+      ml:movesLog.slice(),
+      cW:cpuWarlordCaptured,
+      yW:youWarlordCaptured
+    }); 
+  }
+
+  function restore(s){ 
+    cells=clone(s.b); 
+    turn=s.t; 
+    youCap=s.yc; 
+    cpuCap=s.cc; 
+    centYou=s.cy; 
+    centCpu=s.cp; 
+    phase=s.ph; 
+    youPlaced=s.yp; 
+    cpuPlaced=s.cpP; 
+    turnPlaced=s.tp; 
+    firstMove=s.fm; 
+    movesLog=s.ml.slice(); 
+    cpuWarlordCaptured=s.cW; 
+    youWarlordCaptured=s.yW; 
+    selected=null; 
+    chaining=null; 
+    over=false; 
+    busy=false; 
+    lastFrom=-1; 
+    lastTo=-1; 
+    updateLog(); 
+  }
+
+  function build(){ 
+    boardEl.innerHTML=''; 
+    cellEls=[];
+    for(var i=0;i<49;i++){ 
+      var p=cc(i); 
+      var d=document.createElement('div');
       d.className='cell '+(((p[0]+p[1])%2)?'dk':'lt')+((p[0]===3&&p[1]===3)?' mid':'');
-      d.setAttribute('data-i',i); d.addEventListener('click',onClick); boardEl.appendChild(d); cellEls.push(d); } }
-  function render(captured,moveTo){ captured=captured||[];
-    for(var i=0;i<cellEls.length;i++){ var el=cellEls[i],want=cells[i],pc=el.querySelector('.pc');
+      d.setAttribute('data-i',i); 
+      d.addEventListener('click',onClick); 
+      boardEl.appendChild(d); 
+      cellEls.push(d); 
+    } 
+  }
+
+  function render(captured,moveTo){ 
+    captured=captured||[];
+    for(var i=0;i<cellEls.length;i++){ 
+      var el=cellEls[i], want=cells[i], pc=el.querySelector('.pc');
       if(want){
         if(!pc){
           pc = createPieceElement(want, i===moveTo);
@@ -219,22 +454,66 @@
           el.appendChild(np);
         }
       }
-      else if(pc){ if(captured.indexOf(i)>=0){ pc.classList.add('gone'); (function(p,e){setTimeout(function(){if(p.parentNode===e)e.removeChild(p);},300);})(pc,el); } else el.removeChild(pc); }
-      el.classList.remove('sel','legal','take','last'); if(i===lastFrom||i===lastTo)el.classList.add('last'); }
-    var hi=chaining!=null?chaining:selected;
-    if(hi!=null){ cellEls[hi].classList.add('sel'); var tg=chaining!=null?chainTargets(cells,chaining):moveTargets(cells,selected);
-      for(var t=0;t<tg.length;t++){ cellEls[tg[t]].classList.add('legal'); var c2=clone(cells); if(applyStep(c2,hi,tg[t]).length)cellEls[tg[t]].classList.add('take'); } }
+      else if(pc){ 
+        if(captured.indexOf(i)>=0){ 
+          pc.classList.add('gone'); 
+          (function(p,e){
+            setTimeout(function(){
+              if(p.parentNode===e) e.removeChild(p);
+            },300);
+          })(pc,el); 
+        } else {
+          el.removeChild(pc); 
+        }
+      }
+      el.classList.remove('sel','legal','take','last'); 
+      if(i===lastFrom||i===lastTo) el.classList.add('last'); 
+    }
     
-    // Captured pieces rendering in Chess.com sidebar profiles
+    var hi=chaining!=null?chaining:selected;
+    if(hi!=null){ 
+      cellEls[hi].classList.add('sel'); 
+      var tg=chaining!=null?chainTargets(cells,chaining):moveTargets(cells,selected);
+      for(var t=0;t<tg.length;t++){ 
+        cellEls[tg[t]].classList.add('legal'); 
+        var c2=clone(cells); 
+        if(applyStep(c2,hi,tg[t]).length) cellEls[tg[t]].classList.add('take'); 
+      } 
+    }
+    
     var uBox = $('userCapturedBox'), cBox = $('cpuCapturedBox');
-    if(uBox){ uBox.innerHTML = ''; for(var j=0; j<youCap; j++){ var s=document.createElement('span'); s.className='cap-stone dark'; uBox.appendChild(s); } }
-    if(cBox){ cBox.innerHTML = ''; for(var j=0; j<cpuCap; j++){ var s=document.createElement('span'); s.className='cap-stone light'; cBox.appendChild(s); } }
+    if(uBox){ 
+      uBox.innerHTML = ''; 
+      for(var j=0; j<youCap; j++){ 
+        var s=document.createElement('span'); 
+        s.className='cap-stone dark'; 
+        uBox.appendChild(s); 
+      } 
+    }
+    if(cBox){ 
+      cBox.innerHTML = ''; 
+      for(var j=0; j<cpuCap; j++){ 
+        var s=document.createElement('span'); 
+        s.className='cap-stone light'; 
+        cBox.appendChild(s); 
+      } 
+    }
 
-    // movable hint
     var myTurn = (phase==='play')&&!over&&!busy&&selected==null&&chaining==null&&(mode==='pvp'||turn==='you');
-    for(var m=0;m<cells.length;m++){ var p2=cellEls[m].querySelector('.pc'); if(p2){ p2.classList.toggle('can', myTurn&&side(cells[m])===turn&&moveTargets(cells,m).length>0); } }
-    hud(); }
-  function hud(){ $('youCap').textContent=youCap; $('cpuCap').textContent=cpuCap; if(over)return;
+    for(var m=0;m<cells.length;m++){ 
+      var p2=cellEls[m].querySelector('.pc'); 
+      if(p2){ 
+        p2.classList.toggle('can', myTurn&&side(cells[m])===turn&&moveTargets(cells,m).length>0); 
+      } 
+    }
+    hud(); 
+  }
+
+  function hud(){ 
+    $('youCap').textContent=youCap; 
+    $('cpuCap').textContent=cpuCap; 
+    if(over)return;
+    
     var hintEl = document.querySelector('.hint');
     var afButton = $('autoFill');
     if(afButton) afButton.style.display = (phase === 'placement' && !over && !busy) ? '' : 'none';
@@ -257,13 +536,21 @@
       $('status').textContent = mode==='pvp' ? (turn==='you'?'Light to move':'Dark to move') : (busy?'Enemy is thinking…':'Your move');
       if(hintEl){
         if(firstMove) hintEl.innerHTML="<b>First Move:</b> Light (You) must move a soldier adjacent to the Citadel into the Citadel to open the board.";
-        else hintEl.innerHTML="Glowing soldiers can move. Tap one, then tap a highlighted square. Trap an enemy between two of yours to capture — <b>keep capturing</b> for a combo. Reach <b>7 captures</b> and that soldier becomes a <b>Centurion 👑</b>. Capturing the Enemy Warlord 👑 (by landing on it or sandwiching it) results in an instant victory!";
+        else hintEl.innerHTML="Glowing soldiers can move. Tap one, then tap a highlighted square. Trap an enemy between two of yours to capture — <b>keep capturing</b> for a combo. Promote to <b>Centurion 👑</b> at 7 captures. <b>Warlords 👑</b> can move orthogonally or diagonally, and leap-capture. Capture the enemy Warlord to win instantly!";
       }
     }
   }
-  function pop(txt,big){ var el=$('boardPop'); if(!el)return; el.textContent=txt; el.className='board-pop'+(big?' big':''); void el.offsetWidth; el.classList.add('show'); }
 
-  // ---------- moves ----------
+  function pop(txt,big){ 
+    var el=$('boardPop'); 
+    if(!el)return; 
+    el.textContent=txt; 
+    el.className='board-pop'+(big?' big':''); 
+    void el.offsetWidth; 
+    el.classList.add('show'); 
+  }
+
+  // ---------- MOVES STEP LOGIC ----------
   var COMBO=['','','DOUBLE!','TRIPLE!','ONSLAUGHT!','ANNIHILATION!'];
   function step(from,to){
     var originalCells = clone(cells);
@@ -271,7 +558,6 @@
     if(turn==='you')youCap+=caps.length; else cpuCap+=caps.length;
     if(firstMove)firstMove=false;
     
-    // Check if Warlord was captured
     for(var g=0; g<caps.length; g++){
       var capturedPiece = originalCells[caps[g]];
       if(capturedPiece === 'cpuW') cpuWarlordCaptured = true;
@@ -282,33 +568,119 @@
     var capStr = caps.length ? ' (captured '+caps.length+')' : '';
     addLog(sideName + ': ' + coord(from) + ' ➔ ' + coord(to) + capStr);
     
-    if(caps.length){ turnCaps+=caps.length; if(turnCaps>=2) pop(COMBO[Math.min(turnCaps,5)]); }
-    lastFrom=from; lastTo=to; beep(caps.length?'cap':'move'); render(caps,to);
+    if(caps.length){ 
+      turnCaps+=caps.length; 
+      if(turnCaps>=2) pop(COMBO[Math.min(turnCaps,5)]); 
+    }
+    lastFrom=from; 
+    lastTo=to; 
+    beep(caps.length?'cap':'move'); 
+    render(caps,to);
     
     if(cpuWarlordCaptured) { win('You captured the Enemy Warlord! 🏆'); return caps; }
     if(youWarlordCaptured) { win(mode==='pvp'?'Player 2 captured your Warlord! 🏆':'Enemy captured your Warlord.'); return caps; }
     
-    return caps; }
-  function maybePromote(){ // 7 captures -> Centurion (the piece that just moved)
-    if(turn==='you'&&!centYou&&youCap>=7&&cells[lastTo]&&side(cells[lastTo])==='you'){ cells[lastTo]='youC'; centYou=true; pop('CENTURION! 👑',true); beep('win'); addLog('👑 You promoted a Centurion at '+coord(lastTo)+'!'); }
-    if(turn==='cpu'&&!centCpu&&cpuCap>=7&&cells[lastTo]&&side(cells[lastTo])==='cpu'){ cells[lastTo]='cpuC'; centCpu=true; pop('ENEMY CENTURION! 👑',true); addLog('👑 CPU promoted a Centurion at '+coord(lastTo)+'!'); }
+    return caps; 
   }
-  function humanStep(from,to){ var caps=step(from,to); var cont=caps.length&&!cpuWarlordCaptured&&!youWarlordCaptured?chainTargets(cells,to):[];
-    if(cont.length){ chaining=to; selected=to; render(caps,to); $('status').textContent='Keep capturing! ⚔️'; }
-    else { chaining=null; selected=null; if(!cpuWarlordCaptured&&!youWarlordCaptured) maybePromote(); render(); if(!cpuWarlordCaptured&&!youWarlordCaptured) endTurn(); } }
-  function endTurn(){ var o=opp(turn);
+
+  function maybePromote(){ 
+    if(turn==='you'&&!centYou&&youCap>=7&&cells[lastTo]&&side(cells[lastTo])==='you'&&!isWarlord(cells[lastTo])){ 
+      cells[lastTo]='youC'; 
+      centYou=true; 
+      pop('CENTURION! 👑',true); 
+      beep('win'); 
+      addLog('👑 You promoted a Centurion at '+coord(lastTo)+'!'); 
+    }
+    if(turn==='cpu'&&!centCpu&&cpuCap>=7&&cells[lastTo]&&side(cells[lastTo])==='cpu'&&!isWarlord(cells[lastTo])){ 
+      cells[lastTo]='cpuC'; 
+      centCpu=true; 
+      pop('ENEMY CENTURION! 👑',true); 
+      addLog('👑 CPU promoted a Centurion at '+coord(lastTo)+'!'); 
+    }
+  }
+
+  function humanStep(from,to){ 
+    var caps=step(from,to); 
+    var cont=caps.length&&!cpuWarlordCaptured&&!youWarlordCaptured?chainTargets(cells,to):[];
+    if(cont.length){ 
+      chaining=to; 
+      selected=to; 
+      render(caps,to); 
+      $('status').textContent='Keep capturing! ⚔️'; 
+    } else { 
+      chaining=null; 
+      selected=null; 
+      if(!cpuWarlordCaptured&&!youWarlordCaptured) maybePromote(); 
+      render(); 
+      if(!cpuWarlordCaptured&&!youWarlordCaptured) endTurn(); 
+    } 
+  }
+
+  function endTurn(){ 
+    var o=opp(turn);
     if(pieces(cells,'cpu')<=1)return win('You win! 🏆');
     if(pieces(cells,'you')<=1)return win(mode==='pvp'?'Dark wins! 🏆':'Enemy wins.');
-    if(genTurns(cells,o).length===0)return win(o==='cpu'?'Enemy is blocked — You win! 🏆':(mode==='pvp'?'Light is blocked — Dark wins!':'You are blocked — Enemy wins.'));
-    turn=o; turnCaps=0; snap(); render();
-    if(mode==='cpu'&&turn==='cpu'){ busy=true; hud(); setTimeout(aiTurn,420); } }
-  function aiTurn(){ var t=aiPick(cells,'cpu',diff===1?1:diff===2?2:3); if(!t){ win('Enemy is blocked — You win! 🏆'); return; }
-    turnCaps=0; var s=0; (function next(){
+    
+    var legalTurns = genTurns(cells, o);
+    if(legalTurns.length===0) {
+      return win(o==='cpu'?'Enemy is blocked — You win! 🏆':(mode==='pvp'?'Light is blocked — Dark wins!':'You are blocked — Enemy wins.'));
+    }
+    
+    turn=o; 
+    turnCaps=0; 
+    snap(); 
+    render();
+    if(mode==='cpu'&&turn==='cpu'){ 
+      busy=true; 
+      hud(); 
+      setTimeout(aiTurn,420); 
+    } 
+  }
+
+  function aiTurn(){ 
+    var t=aiPick(cells,'cpu',diff===1?1:diff===2?2:3); 
+    if(!t){ 
+      win('Enemy is blocked — You win! 🏆'); 
+      return; 
+    }
+    turnCaps=0; 
+    var s=0; 
+    (function next(){
       if(cpuWarlordCaptured||youWarlordCaptured) return;
-      if(s>=t.steps.length){ maybePromote(); busy=false; turn='you'; turnCaps=0; selected=null; chaining=null;
-        if(pieces(cells,'you')<=1)return win('Enemy wins.'); if(genTurns(cells,'you').length===0)return win('You are blocked — Enemy wins.'); snap(); render(); return; }
-      var st=t.steps[s++]; turn='cpu'; step(st[0],st[1]); setTimeout(next,420); })(); }
-  function win(msg){ over=true; selected=null; chaining=null; render(); $('status').textContent=msg; var m=$('modal'); if(m){ $('modalMsg').textContent=msg; m.classList.add('show'); } beep('win'); addLog('Game Over: ' + msg); }
+      if(s>=t.steps.length){ 
+        maybePromote(); 
+        busy=false; 
+        turn='you'; 
+        turnCaps=0; 
+        selected=null; 
+        chaining=null;
+        if(pieces(cells,'you')<=1)return win('Enemy wins.'); 
+        if(genTurns(cells,'you').length===0)return win('You are blocked — Enemy wins.'); 
+        snap(); 
+        render(); 
+        return; 
+      }
+      var st=t.steps[s++]; 
+      turn='cpu'; 
+      step(st[0],st[1]); 
+      setTimeout(next,420); 
+    })(); 
+  }
+
+  function win(msg){ 
+    over=true; 
+    selected=null; 
+    chaining=null; 
+    render(); 
+    $('status').textContent=msg; 
+    var m=$('modal'); 
+    if(m){ 
+      $('modalMsg').textContent=msg; 
+      m.classList.add('show'); 
+    } 
+    beep('win'); 
+    addLog('Game Over: ' + msg); 
+  }
 
   function aiPlace(){
     var pType1 = getPieceValue('cpu', cpuPlaced);
@@ -382,17 +754,22 @@
     render();
   }
 
-  function onClick(e){ if(over||busy)return; var i=parseInt(e.currentTarget.getAttribute('data-i'),10);
+  function onClick(e){ 
+    if(over||busy)return; 
+    var i=parseInt(e.currentTarget.getAttribute('data-i'),10);
     if(mode==='cpu'&&turn!=='you')return;
+    
     if(phase==='placement'){
       if(i===24||cells[i])return;
       var pType = turn==='you' ? getPieceValue('you', youPlaced) : getPieceValue('cpu', cpuPlaced);
-      cells[i]=pType; turnPlaced++;
+      cells[i]=pType; 
+      turnPlaced++;
       if(turn==='you')youPlaced++; else cpuPlaced++;
       var sideName = turn==='you' ? 'You' : (mode==='pvp'?'Player 2':'CPU');
       var nameString = pType === 'youW' || pType === 'cpuW' ? 'Warlord' : 'Soldier';
       addLog(sideName + ' placed ' + nameString + ' at ' + coord(i));
-      beep('move'); render();
+      beep('move'); 
+      render();
       if(turnPlaced===2){
         turnPlaced=0;
         if(youPlaced+cpuPlaced===48){
@@ -406,42 +783,174 @@
       }
       return;
     }
-    if(chaining!=null){ if(chainTargets(cells,chaining).indexOf(i)>=0) humanStep(chaining,i); return; }
-    if(selected==null){ if(side(cells[i])===turn&&moveTargets(cells,i).length){ selected=i; render(); } return; }
-    if(moveTargets(cells,selected).indexOf(i)>=0){ humanStep(selected,i); return; }
-    if(side(cells[i])===turn&&moveTargets(cells,i).length){ selected=i; render(); return; }
-    selected=null; render(); }
+    
+    if(chaining!=null){ 
+      if(chainTargets(cells,chaining).indexOf(i)>=0) humanStep(chaining,i); 
+      return; 
+    }
+    if(selected==null){ 
+      if(side(cells[i])===turn&&moveTargets(cells,i).length){ 
+        selected=i; 
+        render(); 
+      } 
+      return; 
+    }
+    if(moveTargets(cells,selected).indexOf(i)>=0){ 
+      humanStep(selected,i); 
+      return; 
+    }
+    if(side(cells[i])===turn&&moveTargets(cells,i).length){ 
+      selected=i; 
+      render(); 
+      return; 
+    }
+    selected=null; 
+    render(); 
+  }
 
   function newGame(){ setup(); snap(); render(); var m=$('modal'); if(m)m.classList.remove('show'); }
-  function undo(){ if(busy)return; var n=mode==='cpu'?2:1; if(history.length<=n){ newGame(); return; }
-    history.splice(-n); restore(history[history.length-1]); render(); var m=$('modal'); if(m)m.classList.remove('show'); }
+  
+  function undo(){ 
+    if(busy)return; 
+    var n=mode==='cpu'?2:1; 
+    if(history.length<=n){ 
+      newGame(); 
+      return; 
+    }
+    history.splice(-n); 
+    restore(history[history.length-1]); 
+    render(); 
+    var m=$('modal'); 
+    if(m)m.classList.remove('show'); 
+  }
 
+  // ---------- LOGGING AND AUDIO ----------
   function addLog(txt){ movesLog.push(txt); updateLog(); }
-  function updateLog(){ var logEl = $('moveLog'); if(!logEl) return;
-    if(movesLog.length === 0){ logEl.innerHTML = '<div class="empty-log">Drop 2 soldiers to begin the placement phase.</div>'; return; }
-    logEl.innerHTML = ''; for(var i=0; i<movesLog.length; i++){ var d = document.createElement('div');
-      d.className = 'log-item'; d.textContent = movesLog[i]; logEl.appendChild(d); }
-    logEl.scrollTop = logEl.scrollHeight; }
+  
+  function updateLog(){ 
+    var logEl = $('moveLog'); 
+    if(!logEl) return;
+    if(movesLog.length === 0){ 
+      logEl.innerHTML = '<div class="empty-log">Drop 2 soldiers to begin the placement phase.</div>'; 
+      return; 
+    }
+    logEl.innerHTML = ''; 
+    for(var i=0; i<movesLog.length; i++){ 
+      var d = document.createElement('div');
+      d.className = 'log-item'; 
+      d.textContent = movesLog[i]; 
+      logEl.appendChild(d); 
+    }
+    logEl.scrollTop = logEl.scrollHeight; 
+  }
 
-  var ac; function beep(type){ try{ if(!ac)ac=new (window.AudioContext||window.webkitAudioContext)();
-    var seq=type==='win'?[523,659,784]:type==='cap'?[210]:[440];
-    seq.forEach(function(f,n){ var o=ac.createOscillator(),g=ac.createGain(); o.type=type==='cap'?'triangle':'sine'; o.frequency.value=f;
-      var t0=ac.currentTime+n*0.09; g.gain.setValueAtTime(0.0001,t0); g.gain.exponentialRampToValueAtTime(0.12,t0+0.01); g.gain.exponentialRampToValueAtTime(0.0001,t0+0.16);
-      o.connect(g); g.connect(ac.destination); o.start(t0); o.stop(t0+0.18); }); }catch(e){} }
+  var ac; 
+  function beep(type){ 
+    try{ 
+      if(!ac)ac=new (window.AudioContext||window.webkitAudioContext)();
+      var seq=type==='win'?[523,659,784]:type==='cap'?[210]:[440];
+      seq.forEach(function(f,n){ 
+        var o=ac.createOscillator(),g=ac.createGain(); 
+        o.type=type==='cap'?'triangle':'sine'; 
+        o.frequency.value=f;
+        var t0=ac.currentTime+n*0.09; 
+        g.gain.setValueAtTime(0.0001,t0); 
+        g.gain.exponentialRampToValueAtTime(0.12,t0+0.01); 
+        g.gain.exponentialRampToValueAtTime(0.0001,t0+0.16);
+        o.connect(g); 
+        g.connect(ac.destination); 
+        o.start(t0); 
+        o.stop(t0+0.18); 
+      }); 
+    }catch(e){} 
+  }
 
-  build(); newGame();
+  build(); 
+  newGame();
+  
   $('newGame').addEventListener('click',newGame);
   var ub=$('undo'); if(ub)ub.addEventListener('click',undo);
   var rb=$('rematch'); if(rb)rb.addEventListener('click',newGame);
   var afb=$('autoFill'); if(afb)afb.addEventListener('click',autoFillBoard);
-  $('modeSeg').addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b)return; var ch=e.currentTarget.children; for(var i=0;i<ch.length;i++)ch[i].classList.remove('active'); b.classList.add('active'); mode=b.getAttribute('data-m'); var dw=$('diffWrap'); if(dw)dw.style.display=mode==='cpu'?'':'none'; newGame(); });
-  var ds=$('diffSeg'); if(ds)ds.addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b)return; var ch=e.currentTarget.children; for(var i=0;i<ch.length;i++)ch[i].classList.remove('active'); b.classList.add('active'); diff=parseInt(b.getAttribute('data-d'),10); newGame(); });
+  
+  $('modeSeg').addEventListener('click',function(e){ 
+    var b=e.target.closest('button'); 
+    if(!b)return; 
+    var ch=e.currentTarget.children; 
+    for(var i=0;i<ch.length;i++)ch[i].classList.remove('active'); 
+    b.classList.add('active'); 
+    mode=b.getAttribute('data-m'); 
+    var dw=$('diffWrap'); 
+    if(dw)dw.style.display=mode==='cpu'?'':'none'; 
+    newGame(); 
+  });
+  
+  var playModeSeg = $('playModeSeg');
+  if (playModeSeg) {
+    playModeSeg.addEventListener('click', function(e) {
+      var b=e.target.closest('button');
+      if(!b)return;
+      var ch=e.currentTarget.children;
+      for(var i=0;i<ch.length;i++)ch[i].classList.remove('active');
+      b.classList.add('active');
+      playMode=b.getAttribute('data-pm');
+      newGame();
+    });
+  }
+
+  var ds=$('diffSeg'); 
+  if(ds)ds.addEventListener('click',function(e){ 
+    var b=e.target.closest('button'); 
+    if(!b)return; 
+    var ch=e.currentTarget.children; 
+    for(var i=0;i<ch.length;i++)ch[i].classList.remove('active'); 
+    b.classList.add('active'); 
+    diff=parseInt(b.getAttribute('data-d'),10); 
+    newGame(); 
+  });
 
   // learn diagrams
-  function dc(o){o=o||{};var c=document.createElement('div');c.className='dcell'+(o.hl?' hl':'');
-    if(o.dot){var d=document.createElement('div');d.className='dot '+o.dot;c.appendChild(d);} if(o.x){var x=document.createElement('span');x.className='x';x.textContent='✕';c.appendChild(x);} if(o.crown){var k=document.createElement('span');k.className='crown';k.textContent='♛';c.appendChild(k);} return c;}
-  function arr(){var a=document.createElement('span');a.className='arrow';a.textContent='→';return a;}
-  function fill(s,n){var b=document.querySelector(s);if(b)n.forEach(function(x){b.appendChild(x);});}
-  fill('.d-move',[dc({dot:'t'}),arr(),dc({hl:true})]); fill('.d-cap',[dc({dot:'t'}),dc({dot:'e',x:true}),dc({dot:'t'})]);
-  fill('.d-combo',[dc({dot:'t'}),dc({dot:'e',x:true}),dc({dot:'e',x:true}),dc({dot:'t'})]); fill('.d-crown',[dc({dot:'g',crown:true})]);
+  function dc(o){
+    o=o||{};
+    var c=document.createElement('div');
+    c.className='dcell'+(o.hl?' hl':'');
+    if(o.dot){
+      var d=document.createElement('div');
+      d.className='dot '+o.dot;
+      c.appendChild(d);
+    } 
+    if(o.x){
+      var x=document.createElement('span');
+      x.className='x';
+      x.textContent='✕';
+      c.appendChild(x);
+    } 
+    if(o.crown){
+      var k=document.createElement('span');
+      k.className='crown';
+      k.textContent='👑';
+      c.appendChild(k);
+    } 
+    return c;
+  }
+  function arr(){
+    var a=document.createElement('span');
+    a.className='arrow';
+    a.textContent='→';
+    return a;
+  }
+  function fill(s,n){
+    var b=document.querySelector(s);
+    if(b) {
+      b.innerHTML = '';
+      n.forEach(function(x){
+        b.appendChild(x);
+      });
+    }
+  }
+  
+  fill('.d-move',[dc({dot:'t'}),arr(),dc({hl:true})]); 
+  fill('.d-cap',[dc({dot:'t'}),dc({dot:'e',x:true}),dc({dot:'t'})]);
+  fill('.d-combo',[dc({dot:'t'}),dc({dot:'e',x:true}),dc({dot:'e',x:true}),dc({dot:'t'})]); 
+  fill('.d-crown',[dc({dot:'g',crown:true})]);
 })();

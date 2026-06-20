@@ -388,52 +388,148 @@ em {
   position: relative;
   width: 82%;
   height: 82%;
-  border-radius: 58% 42% 50% 50% / 50% 55% 45% 50%;
+  border-radius: 50%;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.5), inset 0 -4px 6px rgba(0,0,0,0.4), inset 0 4px 6px rgba(255,255,255,0.2);
-  transition: transform .18s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity .25s;
+  transition: transform .22s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity .25s, box-shadow .22s;
   z-index: 2;
 }
 
+/* Light Pieces - Carthaginian Ivory & Gold Marble */
 .pc.you {
-  background: radial-gradient(circle at 35% 30%, #fffdf6 0%, #e6d3af 60%, #bc9864 100%);
-  border: 2px solid #caa370;
+  background: radial-gradient(circle at 30% 30%, #ffffff 0%, #fefcf7 30%, #f6edd7 65%, #dec9a5 100%);
+  border: 2px solid rgba(212, 175, 55, 0.6);
+  box-shadow: 
+    inset 0 2px 4px rgba(255, 255, 255, 0.9), 
+    inset 0 -3px 6px rgba(0, 0, 0, 0.15),
+    0 5px 10px rgba(0, 0, 0, 0.45);
 }
 
+/* Dark Pieces - Roman Basalt/Obsidian Marble */
 .pc.cpu {
-  background: radial-gradient(circle at 35% 30%, #566472 0%, #2f3843 60%, #151b22 100%);
-  border: 2px solid #3c4856;
+  background: radial-gradient(circle at 30% 30%, #4f5a65 0%, #2f373f 35%, #181d22 75%, #0d0f12 100%);
+  border: 2px solid rgba(197, 182, 167, 0.25);
+  box-shadow: 
+    inset 0 2px 4px rgba(255, 255, 255, 0.25), 
+    inset 0 -3px 6px rgba(0, 0, 0, 0.65),
+    0 5px 10px rgba(0, 0, 0, 0.55);
 }
 
+/* Special Warlord Token styling */
+.pc.you.warlord {
+  border: 2.5px solid #d4af37;
+  box-shadow: 
+    inset 0 2px 5px rgba(255, 255, 255, 0.9), 
+    inset 0 -3px 6px rgba(0, 0, 0, 0.2),
+    0 0 0 2px rgba(212, 175, 55, 0.45),
+    0 6px 16px rgba(212, 175, 55, 0.5);
+  animation: warlord-glow-you 2.2s infinite ease-in-out;
+}
+
+.pc.cpu.warlord {
+  border: 2.5px solid #ee5253;
+  box-shadow: 
+    inset 0 2px 4px rgba(255, 255, 255, 0.35), 
+    inset 0 -3px 6px rgba(0, 0, 0, 0.65),
+    0 0 0 2px rgba(238, 82, 83, 0.45),
+    0 6px 16px rgba(238, 82, 83, 0.5);
+  animation: warlord-glow-cpu 2.2s infinite ease-in-out;
+}
+
+@keyframes warlord-glow-you {
+  0%, 100% { box-shadow: inset 0 2px 5px rgba(255,255,255,0.9), inset 0 -3px 6px rgba(0,0,0,0.2), 0 0 0 2px rgba(212, 175, 55, 0.35), 0 5px 12px rgba(212, 175, 55, 0.35); }
+  50% { box-shadow: inset 0 2px 5px rgba(255,255,255,0.9), inset 0 -3px 6px rgba(0,0,0,0.2), 0 0 0 4px rgba(212, 175, 55, 0.65), 0 8px 20px rgba(212, 175, 55, 0.6); }
+}
+
+@keyframes warlord-glow-cpu {
+  0%, 100% { box-shadow: inset 0 2px 4px rgba(255,255,255,0.35), inset 0 -3px 6px rgba(0,0,0,0.65), 0 0 0 2px rgba(238, 82, 83, 0.35), 0 5px 12px rgba(238, 82, 83, 0.35); }
+  50% { box-shadow: inset 0 2px 4px rgba(255,255,255,0.35), inset 0 -3px 6px rgba(0,0,0,0.65), 0 0 0 4px rgba(238, 82, 83, 0.65), 0 8px 20px rgba(238, 82, 83, 0.6); }
+}
+
+/* Centurion Token styling */
+.pc.you.cent {
+  border: 2.5px solid #ffe066;
+  box-shadow: 
+    inset 0 2px 5px rgba(255, 255, 255, 0.9), 
+    inset 0 -3px 6px rgba(0, 0, 0, 0.2),
+    0 0 15px rgba(255, 224, 102, 0.55),
+    0 5px 10px rgba(0, 0, 0, 0.45);
+}
+
+.pc.cpu.cent {
+  border: 2.5px solid #ff6b6b;
+  box-shadow: 
+    inset 0 2px 4px rgba(255, 255, 255, 0.35), 
+    inset 0 -3px 6px rgba(0, 0, 0, 0.65),
+    0 0 15px rgba(255, 107, 107, 0.55),
+    0 5px 10px rgba(0, 0, 0, 0.55);
+}
+
+/* Vector Glyph styling inside pieces */
+.pc-svg {
+  width: 48%;
+  height: 48%;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.45));
+  transition: transform 0.2s ease;
+  pointer-events: none;
+}
+
+.pc.warlord .pc-svg {
+  width: 52%;
+  height: 52%;
+}
+
+.pc.cent .pc-svg {
+  width: 50%;
+  height: 50%;
+}
+
+/* Hover/Selection shadow behaviors */
 .cell::before {
   content: "";
   position: absolute;
   bottom: 6%;
-  width: 55%;
-  height: 8%;
-  background: rgba(0, 0, 0, 0.4);
+  width: 52%;
+  height: 7%;
+  background: rgba(0, 0, 0, 0.45);
   border-radius: 50%;
   filter: blur(2px);
   z-index: 1;
-  transition: all 0.2s ease;
+  transition: all 0.22s ease;
   pointer-events: none;
 }
 
 .cell.sel::before {
-  width: 70%;
-  background: rgba(212, 175, 55, 0.45);
+  width: 68%;
+  height: 8%;
+  background: rgba(212, 175, 55, 0.35);
   filter: blur(4px);
 }
 
 .cell.sel .pc {
-  transform: translateY(-8px) scale(1.08);
+  transform: translateY(-7px) scale(1.05);
+  box-shadow: 
+    inset 0 2px 4px rgba(255, 255, 255, 0.5),
+    0 12px 24px rgba(0, 0, 0, 0.55);
+}
+
+.cell.sel .pc.you.warlord {
+  box-shadow: 
+    inset 0 2px 5px rgba(255,255,255,0.9), 
+    0 0 0 3px rgba(212, 175, 55, 0.8), 
+    0 14px 28px rgba(212, 175, 55, 0.65);
+}
+
+.cell.sel .pc.cpu.warlord {
+  box-shadow: 
+    inset 0 2px 4px rgba(255,255,255,0.35), 
+    0 0 0 3px rgba(238, 82, 83, 0.8), 
+    0 14px 28px rgba(238, 82, 83, 0.65);
 }
 
 .cell.legal:hover .pc {
-  transform: scale(1.05);
+  transform: scale(1.03);
 }
 
 .pc.can {
@@ -442,224 +538,8 @@ em {
 }
 
 @keyframes canpulse {
-  0%, 100% { box-shadow: 0 6px 10px rgba(0, 0, 0, 0.5), 0 0 0 0 rgba(212, 175, 55, 0.6); }
-  50% { box-shadow: 0 6px 10px rgba(0, 0, 0, 0.5), 0 0 0 6px rgba(212, 175, 55, 0); }
-}
-
-.face {
-  position: absolute;
-  width: 70%;
-  height: 50%;
-  bottom: 12%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 5;
-  pointer-events: none;
-}
-
-.eyes {
-  display: flex;
-  justify-content: space-between;
-  width: 75%;
-  margin-bottom: 2px;
-}
-
-.eye {
-  width: 8px;
-  height: 8px;
-  background: #111;
-  border-radius: 50%;
-  position: relative;
-}
-
-.eye::before {
-  content: "";
-  position: absolute;
-  top: 1.5px;
-  left: 1.5px;
-  width: 2.5px;
-  height: 2.5px;
-  background: #fff;
-  border-radius: 50%;
-}
-
-.smile {
-  width: 10px;
-  height: 5px;
-  border-bottom: 2px solid #111;
-  border-radius: 0 0 5px 5px;
-  margin-top: 1px;
-}
-
-.pc.warlord .eye {
-  width: 9px;
-  height: 9px;
-  background: #000;
-}
-
-.pc.warlord .smile {
-  width: 12px;
-  height: 6px;
-  border-bottom: 3px solid #000;
-}
-
-.helmet {
-  position: absolute;
-  top: -16%;
-  width: 80%;
-  height: 40%;
-  z-index: 6;
-  pointer-events: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.crest {
-  width: 4px;
-  height: 14px;
-  border-radius: 2px 2px 0 0;
-  margin-bottom: -4px;
-  position: relative;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-}
-
-.pc.you .crest {
-  background: #d4af37;
-}
-
-.pc.cpu .crest {
-  background: #ee5253;
-}
-
-.pc.warlord .crest {
-  width: 8px;
-  height: 18px;
-  margin-bottom: -5px;
-  border-radius: 4px 4px 0 0;
-}
-
-.pc.you.warlord .crest {
-  background: linear-gradient(#ffe066, #d4af37);
-  box-shadow: 0 0 6px #d4af37;
-}
-
-.pc.cpu.warlord .crest {
-  background: linear-gradient(#ff6b6b, #ee5253);
-  box-shadow: 0 0 6px #ee5253;
-}
-
-.helmet::after {
-  content: "";
-  width: 100%;
-  height: 18px;
-  border-radius: 50% 50% 10% 10% / 70% 70% 30% 30%;
-  border-bottom: 1.5px solid rgba(0,0,0,0.4);
-  box-shadow: inset 0 2px 4px rgba(255,255,255,0.3);
-}
-
-.pc.you .helmet::after {
-  background: linear-gradient(#ecd69f, #b39255);
-}
-
-.pc.cpu .helmet::after {
-  background: linear-gradient(#6c7b8c, #3f4a56);
-}
-
-.pc.warlord .helmet::after {
-  content: "👑";
-  font-size: 1.35rem;
-  background: none !important;
-  border: none !important;
-  box-shadow: none !important;
-  margin-top: -8px;
-  text-shadow: 0 2px 5px rgba(0,0,0,0.5);
-  animation: floatcrown 2s ease-in-out infinite;
-}
-
-@keyframes floatcrown {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
-}
-
-.shield {
-  position: absolute;
-  width: 22px;
-  height: 22px;
-  right: -6px;
-  bottom: 10%;
-  border-radius: 50%;
-  border: 1.5px solid #8d6b39;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 3px rgba(255,255,255,0.4);
-  z-index: 7;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.pc.you .shield {
-  background: radial-gradient(circle at 35% 30%, #e5c158, #b88d22);
-  border-color: #8c6a12;
-}
-
-.pc.cpu .shield {
-  background: radial-gradient(circle at 35% 30%, #78909c, #37474f);
-  border-color: #263238;
-}
-
-.pc.warlord .shield {
-  width: 26px;
-  height: 26px;
-  right: -8px;
-  bottom: 8%;
-  border: 2px solid;
-}
-
-.pc.you.warlord .shield {
-  border-color: #ffe680;
-  box-shadow: 0 2px 6px rgba(212,175,55,0.6);
-}
-
-.pc.cpu.warlord .shield {
-  border-color: #ff8080;
-  box-shadow: 0 2px 6px rgba(238,82,83,0.6);
-}
-
-.pc.warlord .shield::after {
-  content: "✦";
-  font-size: 0.65rem;
-  color: rgba(255,255,255,0.9);
-  text-shadow: 0 1px 1px rgba(0,0,0,0.5);
-}
-
-.pc.you.warlord {
-  box-shadow: 0 6px 10px rgba(0,0,0,0.5), 0 0 0 3px #d4af37, 0 0 18px rgba(212, 175, 55, 0.95);
-}
-
-.pc.cpu.warlord {
-  box-shadow: 0 6px 10px rgba(0,0,0,0.5), 0 0 0 3px #ee5253, 0 0 18px rgba(238, 82, 83, 0.95);
-}
-
-.pc.cent {
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.5), 0 0 0 3px #d4af37, 0 0 16px rgba(212, 175, 55, 0.8);
-}
-
-.pc.cent::after {
-  content: "♛";
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  font-size: 1.05em;
-  color: #7b5f10;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-}
-
-.pc.cpu.cent::after {
-  color: #ffe775;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+  0%, 100% { box-shadow: 0 5px 10px rgba(0, 0, 0, 0.45), 0 0 0 0 rgba(212, 175, 55, 0.6); }
+  50% { box-shadow: 0 5px 10px rgba(0, 0, 0, 0.45), 0 0 0 6px rgba(212, 175, 55, 0); }
 }
 
 .pc.pop {
