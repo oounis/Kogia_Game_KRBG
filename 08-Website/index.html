@@ -69,18 +69,28 @@
 <!-- TRICKS / 3D demo -->
 <section class="section alt" id="tricks">
   <div class="wrap">
-    <div class="sec-head reveal"><span class="kicker">◆ Watch it live</span><h2>See the Magic</h2>
-      <p class="sec-lead">Real-time 3D — Roman legions march, strike in dazzling combos, and rise to glory.</p></div>
-    <div class="stage reveal">
-      <div class="stage-top"><span class="pill"><span class="dot gold"></span> Terracotta</span>
-        <span class="combo-tag">Combo <b id="comboN">0</b></span><span class="pill"><span class="dot teal"></span> Slate</span></div>
-      <div class="canvas-wrap">
-        <canvas id="scene3d"></canvas>
-        <div class="stage-flash" id="stageFlash"></div>
-        <div class="combo-pop" id="comboPop"></div>
+    <div class="sec-head reveal"><span class="kicker">◆ Learn by playing — no videos, no autoplay</span><h2>Touch the Board</h2>
+      <p class="sec-lead">Rotate it. Zoom it. Move the pieces yourself. <b>The tutorial is the game.</b></p></div>
+    <div class="lab reveal">
+      <div class="lab-tabs" id="labTabs">
+        <button class="lab-tab active" data-t="0">① Moves</button>
+        <button class="lab-tab" data-t="1">② Captures</button>
+        <button class="lab-tab" data-t="2">③ Winning</button>
+        <button class="lab-tab" data-t="3">④ Strategy</button>
       </div>
-      <div class="scene3d-fallback" id="scene3dFallback">Loading the board… 🎮</div>
-      <div class="cap" id="matchCap">Two legions, one board — watch the combo…</div>
+      <div class="lab-grid">
+        <div class="lab-canvas-wrap">
+          <canvas id="scene3d"></canvas>
+          <div class="scene3d-fallback" id="scene3dFallback">3D needs a WebGL browser 🎮</div>
+          <div class="lab-hint">✋ drag = rotate · scroll = zoom · tap a piece</div>
+        </div>
+        <div class="lab-hud">
+          <div class="lab-step" id="labStep">Tutorial ① — Moves</div>
+          <p class="lab-instr" id="labInstr">Tap the glowing soldier, then tap a green square to move it.</p>
+          <p class="lab-feedback" id="labFeedback">&nbsp;</p>
+          <button class="btn btn-cta" id="labReset">↺ Reset</button>
+        </div>
+      </div>
     </div>
     <div class="feat-row reveal">
       <div class="feat"><span class="fno">01</span><h3>⚡ Combo Captures</h3><p>Trap a rival between two of yours and it shatters — then <b>keep going</b>. Chain it:
