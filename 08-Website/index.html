@@ -25,6 +25,7 @@
     <section class="board-area">
       <div class="board-frame">
         <div class="board" id="board" aria-label="Kharbga board"></div>
+        <div class="board-pop" id="boardPop"></div>
       </div>
     </section>
 
@@ -59,7 +60,7 @@
         <button class="btn btn-ghost" id="undo">↩ Undo</button>
       </div>
 
-      <p class="hint">Tap a soldier, then tap a highlighted square. Trap an enemy between two of yours on a line to capture it — and <b>keep capturing</b> in a combo!</p>
+      <p class="hint">Glowing soldiers can move. Tap one, then tap a highlighted square. Trap an enemy between two of yours to capture — <b>keep capturing</b> for a combo. Reach <b>7 captures</b> and that soldier becomes a <b>Centurion 👑</b> that slides across the board like a rook.</p>
     </aside>
   </div>
 
@@ -79,7 +80,7 @@
       <div class="step"><div class="diagram d-move"></div><h3>Move</h3><p>Slide a soldier one square — up, down, left or right. Never diagonally.</p></div>
       <div class="step"><div class="diagram d-cap"></div><h3>Surround</h3><p>Trap an enemy between two of yours on a line, and it's captured.</p></div>
       <div class="step"><div class="diagram d-combo"></div><h3>Multi-capture</h3><p>A single move can capture several enemies at once.</p></div>
-      <div class="step"><div class="diagram d-crown"></div><h3>Win</h3><p>Capture the enemy down to one piece — or block them entirely.</p></div>
+      <div class="step"><div class="diagram d-crown"></div><h3>Centurion</h3><p>Your 7th capture promotes that soldier to a Centurion — it slides any distance to break the board open.</p></div>
     </div>
   </div>
 </section>
@@ -93,6 +94,7 @@
       <li><b>Moving.</b> One soldier per turn moves a single square orthogonally into an empty cell.</li>
       <li><b>Capturing.</b> Move so an enemy is sandwiched between two of your soldiers on a row or column — it's removed. A move may trap several at once.</li>
       <li><b>Safe.</b> A soldier that moves <em>itself</em> between two enemies is not captured.</li>
+      <li><b>The Centurion.</b> When one of your soldiers makes your <em>7th capture</em>, it is promoted to a Centurion: it slides any number of empty squares in a straight line (like a rook), still capturing by the sandwich rule. Othman's own innovation to break the midgame open.</li>
       <li><b>Winning.</b> Reduce the enemy to one soldier, or leave them with no legal move.</li>
       <li><b>Pure skill.</b> No dice, no cards, no luck — descended from the Roman <em>Ludus Latrunculorum</em>.</li>
     </ul>
