@@ -25,9 +25,92 @@
     return 'Soldier';
   }
 
+  // ---------- 3D CHIBI PIECE MARKUP GENERATOR ----------
+  function createPieceElement(v, isPop) {
+    var s = side(v);
+    var type = v.substring(3); // 'W' or ''
+    var cls = 'pc ' + s + (type === 'W' ? ' warlord' : (isCent(v) ? ' cent' : ''));
+    
+    var pc = document.createElement('div');
+    pc.className = cls;
+    pc.dataset.v = v;
+    if(isPop) pc.classList.add('pop');
+    
+    // Add Roman Helmet & plume
+    var helmet = document.createElement('div');
+    helmet.className = 'helmet';
+    var crest = document.createElement('div');
+    crest.className = 'crest';
+    helmet.appendChild(crest);
+    pc.appendChild(helmet);
+    
+    // Add Chibi Face (eyes & smile)
+    var face = document.createElement('div');
+    face.className = 'face';
+    var eyes = document.createElement('div');
+    eyes.className = 'eyes';
+    var eyeL = document.createElement('div');
+    eyeL.className = 'eye l';
+    var eyeR = document.createElement('div');
+    eyeR.className = 'eye r';
+    eyes.appendChild(eyeL);
+    eyes.appendChild(eyeR);
+    face.appendChild(eyes);
+    var smile = document.createElement('div');
+    smile.className = 'smile';
+    face.appendChild(smile);
+    pc.appendChild(face);
+    
+    // Add tiny round shield
+    var shield = document.createElement('div');
+    shield.className = 'shield';
+    pc.appendChild(shield);
+    
+    return pc;
+  }
+
   function getPieceValue(s, count) {
     if(count === 0) return s === 'you' ? 'youW' : 'cpuW';
     return s;
+  }
+
+  // ---------- SMART CPU PLACEMENT HEURISTICS ----------
+  function getCpuPlacementSlots(isWarlord) {
+    var empty = [];
+    for(var i=0; i<49; i++) {
+      if(i === 24 || cells[i]) continue;
+      var r = Math.floor(i / 7);
+      var c = i % 7;
+      if(r < 3 || (r === 3 && c < 3)) {
+        empty.push(i);
+      }
+    }
+    if(empty.length === 0) {
+      for(var i=0; i<49; i++) { if(i !== 24 && !cells[i]) empty.push(i); }
+    }
+    if(isWarlord) {
+      var backRank = empty.filter(function(x) { return Math.floor(x / 7) === 0; });
+      if(backRank.length > 0) return backRank;
+      var secondRank = empty.filter(function(x) { return Math.floor(x / 7) === 1; });
+      if(secondRank.length > 0) return secondRank;
+    } else {
+      var adjacent = [];
+      for(var j=0; j<empty.length; j++) {
+        var idxVal = empty[j];
+        var p = cc(idxVal);
+        var hasCpuAdj = false;
+        for(var k=0; k<4; k++) {
+          var nc = p[0]+DIRS[k][0], nr = p[1]+DIRS[k][1];
+          if(inB(nc,nr) && cells[idx(nc,nr)] && side(cells[idx(nc,nr)]) === 'cpu') {
+            hasCpuAdj = true;
+            break;
+          }
+        }
+        if(hasCpuAdj) adjacent.push(idxVal);
+      }
+      if(adjacent.length > 0) return adjacent;
+    }
+    return empty;
   }
 
   // ---------- RULES ENGINE (pure) ----------
@@ -124,17 +207,18 @@
     for(var i=0;i<49;i++){ var p=cc(i); var d=document.createElement('div');
       d.className='cell '+(((p[0]+p[1])%2)?'dk':'lt')+((p[0]===3&&p[1]===3)?' mid':'');
       d.setAttribute('data-i',i); d.addEventListener('click',onClick); boardEl.appendChild(d); cellEls.push(d); } }
-  function pcClass(v){
-    var s = side(v);
-    var type = v.substring(3);
-    var typeClass = type === 'W' ? ' warlord' : (isCent(v) ? ' cent' : '');
-    return 'pc ' + s + typeClass;
-  }
   function render(captured,moveTo){ captured=captured||[];
     for(var i=0;i<cellEls.length;i++){ var el=cellEls[i],want=cells[i],pc=el.querySelector('.pc');
-      if(want){ var cls=pcClass(want);
-        if(!pc){ pc=document.createElement('div'); pc.className=cls; pc.dataset.v=want; if(i===moveTo)pc.classList.add('pop'); el.appendChild(pc); }
-        else if(pc.dataset.v!==want){ el.removeChild(pc); var np=document.createElement('div'); np.className=cls; np.dataset.v=want; if(i===moveTo)np.classList.add('pop'); el.appendChild(np); } }
+      if(want){
+        if(!pc){
+          pc = createPieceElement(want, i===moveTo);
+          el.appendChild(pc);
+        } else if(pc.dataset.v !== want){
+          el.removeChild(pc);
+          var np = createPieceElement(want, i===moveTo);
+          el.appendChild(np);
+        }
+      }
       else if(pc){ if(captured.indexOf(i)>=0){ pc.classList.add('gone'); (function(p,e){setTimeout(function(){if(p.parentNode===e)e.removeChild(p);},300);})(pc,el); } else el.removeChild(pc); }
       el.classList.remove('sel','legal','take','last'); if(i===lastFrom||i===lastTo)el.classList.add('last'); }
     var hi=chaining!=null?chaining:selected;
@@ -152,6 +236,9 @@
     hud(); }
   function hud(){ $('youCap').textContent=youCap; $('cpuCap').textContent=cpuCap; if(over)return;
     var hintEl = document.querySelector('.hint');
+    var afButton = $('autoFill');
+    if(afButton) afButton.style.display = (phase === 'placement' && !over && !busy) ? '' : 'none';
+    
     if(phase==='placement'){
       var leftYou=24-youPlaced, leftCpu=24-cpuPlaced;
       if(mode==='pvp'){
@@ -224,23 +311,30 @@
   function win(msg){ over=true; selected=null; chaining=null; render(); $('status').textContent=msg; var m=$('modal'); if(m){ $('modalMsg').textContent=msg; m.classList.add('show'); } beep('win'); addLog('Game Over: ' + msg); }
 
   function aiPlace(){
-    var empty=[]; for(var i=0;i<49;i++){ if(i!==24&&!cells[i])empty.push(i); }
-    if(empty.length>=2){
-      var idx1=Math.floor(Math.random()*empty.length); var cell1=empty[idx1]; empty.splice(idx1,1);
-      var idx2=Math.floor(Math.random()*empty.length); var cell2=empty[idx2];
-      
-      var pType1 = getPieceValue('cpu', cpuPlaced);
-      cells[cell1]=pType1; cpuPlaced++;
-      
-      var pType2 = getPieceValue('cpu', cpuPlaced);
-      cells[cell2]=pType2; cpuPlaced++;
-      
-      beep('move'); 
-      var name1 = pType1 === 'cpuW' ? 'Warlord' : 'Soldier';
-      var name2 = pType2 === 'cpuW' ? 'Warlord' : 'Soldier';
-      addLog('CPU placed '+name1+' at '+coord(cell1)+' & '+name2+' at '+coord(cell2));
-      render();
+    var pType1 = getPieceValue('cpu', cpuPlaced);
+    var isWarlord1 = pType1 === 'cpuW';
+    var slots1 = getCpuPlacementSlots(isWarlord1);
+    var cell1 = slots1[Math.floor(Math.random() * slots1.length)];
+    cells[cell1] = pType1;
+    cpuPlaced++;
+    
+    var pType2 = getPieceValue('cpu', cpuPlaced);
+    var isWarlord2 = pType2 === 'cpuW';
+    var slots2 = getCpuPlacementSlots(isWarlord2);
+    slots2 = slots2.filter(function(x) { return x !== cell1; });
+    if(slots2.length === 0) {
+      for(var i=0; i<49; i++) { if(i!==24 && i!==cell1 && !cells[i]) slots2.push(i); }
     }
+    var cell2 = slots2[Math.floor(Math.random() * slots2.length)];
+    cells[cell2] = pType2;
+    cpuPlaced++;
+    
+    beep('move'); 
+    var name1 = pType1 === 'cpuW' ? 'Warlord' : 'Soldier';
+    var name2 = pType2 === 'cpuW' ? 'Warlord' : 'Soldier';
+    addLog('CPU placed '+name1+' at '+coord(cell1)+' & '+name2+' at '+coord(cell2));
+    render();
+    
     turnPlaced=0;
     if(youPlaced+cpuPlaced===48){
       phase='play'; turn='you'; firstMove=true; pop('PLAY PHASE! ⚔️',true);
@@ -248,6 +342,44 @@
       turn='you';
     }
     busy=false; snap(); render();
+  }
+
+  function autoFillBoard() {
+    if (phase !== 'placement') return;
+    cells = new Array(49).fill(null);
+    var youSlots = [];
+    var cpuSlots = [];
+    for(var r=0; r<7; r++) {
+      for(var c=0; c<7; c++) {
+        var i = r*7 + c;
+        if(i === 24) continue;
+        if(r < 3 || (r === 3 && c < 3)) { cpuSlots.push(i); }
+        else { youSlots.push(i); }
+      }
+    }
+    var youWarlordIndex = 42 + Math.floor(Math.random() * 7);
+    var cpuWarlordIndex = Math.floor(Math.random() * 7);
+    
+    cells[youWarlordIndex] = 'youW';
+    cells[cpuWarlordIndex] = 'cpuW';
+    
+    youSlots = youSlots.filter(function(x) { return x !== youWarlordIndex; });
+    cpuSlots = cpuSlots.filter(function(x) { return x !== cpuWarlordIndex; });
+    
+    for(var s=0; s<youSlots.length; s++) { cells[youSlots[s]] = 'you'; }
+    for(var s=0; s<cpuSlots.length; s++) { cells[cpuSlots[s]] = 'cpu'; }
+    
+    youPlaced = 24;
+    cpuPlaced = 24;
+    turnPlaced = 0;
+    phase = 'play';
+    turn = 'you';
+    firstMove = true;
+    
+    addLog('⚡ Auto-Fill complete: smart battle lines drawn!');
+    pop('PLAY PHASE! ⚔️', true);
+    snap();
+    render();
   }
 
   function onClick(e){ if(over||busy)return; var i=parseInt(e.currentTarget.getAttribute('data-i'),10);
@@ -301,6 +433,7 @@
   $('newGame').addEventListener('click',newGame);
   var ub=$('undo'); if(ub)ub.addEventListener('click',undo);
   var rb=$('rematch'); if(rb)rb.addEventListener('click',newGame);
+  var afb=$('autoFill'); if(afb)afb.addEventListener('click',autoFillBoard);
   $('modeSeg').addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b)return; var ch=e.currentTarget.children; for(var i=0;i<ch.length;i++)ch[i].classList.remove('active'); b.classList.add('active'); mode=b.getAttribute('data-m'); var dw=$('diffWrap'); if(dw)dw.style.display=mode==='cpu'?'':'none'; newGame(); });
   var ds=$('diffSeg'); if(ds)ds.addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b)return; var ch=e.currentTarget.children; for(var i=0;i<ch.length;i++)ch[i].classList.remove('active'); b.classList.add('active'); diff=parseInt(b.getAttribute('data-d'),10); newGame(); });
 
