@@ -283,7 +283,7 @@
   }
 
   // ---------- UI STATE ----------
-  var cells, turn, mode='cpu', playMode='direct', diff=2, selected=null, chaining=null, over=false, busy=false;
+  var cells, turn, mode='cpu', playMode='draft', diff=2, selected=null, chaining=null, over=false, busy=false;
   var youCap=0, cpuCap=0, centYou=false, centCpu=false, turnCaps=0, lastFrom=-1, lastTo=-1, history=[];
   var phase='play', youPlaced=24, cpuPlaced=24, turnPlaced=0, firstMove=true, movesLog=[];
   var cpuSultanCaptured=false, youSultanCaptured=false;
