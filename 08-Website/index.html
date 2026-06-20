@@ -69,16 +69,18 @@
 <!-- TRICKS / 3D demo -->
 <section class="section alt" id="tricks">
   <div class="wrap">
-    <div class="sec-head reveal"><span class="kicker">◆ The trailer</span><h2>See the Magic</h2>
-      <p class="sec-lead">Surround. Strike. Chain combos. Crown your Centurion. Conquer the desert.</p></div>
-    <div class="trailer reveal">
-      <div class="trailer-bg" style="background-image:url('img/plaza.jpg')"></div>
-      <div class="trailer-veil"></div>
-      <div class="trailer-words" id="trailerWords">
-        <span class="tw">SURROUND</span><span class="tw">STRIKE ⚔️</span><span class="tw">COMBO!</span>
-        <span class="tw">CENTURION 👑</span><span class="tw">VICTORIA!</span>
+    <div class="sec-head reveal"><span class="kicker">◆ Watch it live</span><h2>See the Magic</h2>
+      <p class="sec-lead">Real-time 3D — Roman legions march, strike in dazzling combos, and rise to glory.</p></div>
+    <div class="stage reveal">
+      <div class="stage-top"><span class="pill"><span class="dot gold"></span> Terracotta</span>
+        <span class="combo-tag">Combo <b id="comboN">0</b></span><span class="pill"><span class="dot teal"></span> Slate</span></div>
+      <div class="canvas-wrap">
+        <canvas id="scene3d"></canvas>
+        <div class="stage-flash" id="stageFlash"></div>
+        <div class="combo-pop" id="comboPop"></div>
       </div>
-      <div class="trailer-tag">Kharbga: Origins</div>
+      <div class="scene3d-fallback" id="scene3dFallback">Loading the board… 🎮</div>
+      <div class="cap" id="matchCap">Two legions, one board — watch the combo…</div>
     </div>
     <div class="feat-row reveal">
       <div class="feat"><span class="fno">01</span><h3>⚡ Combo Captures</h3><p>Trap a rival between two of yours and it shatters — then <b>keep going</b>. Chain it:
@@ -142,5 +144,7 @@
 <footer class="footer"><span class="logo">◆ KHARBGA</span><span class="muted">© 2026 Kogia Games · Older than chess · Pure skill</span></footer>
 
 <script src="script.js"></script>
+<script src="vendor/three.min.js"></script>
+<script src="scene.js"></script>
 </body>
 </html>

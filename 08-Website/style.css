@@ -196,4 +196,13 @@ h1,h2,h3,h4,.logo,.title,.kicker,.big,.t-item b,.combo-pop,.marquee,.spec b{font
 .trailer-tag{position:absolute;bottom:18px;right:22px;z-index:3;font-family:'Cinzel';font-weight:700;font-size:.82rem;
   letter-spacing:.14em;color:#ffe6b0;text-shadow:0 2px 8px rgba(0,0,0,.6)}
 
+/* 3D stage flash overlay */
+.canvas-wrap{position:relative;border-radius:18px;overflow:hidden}
+.stage-flash{position:absolute;inset:0;pointer-events:none;z-index:4;opacity:0;
+  background:radial-gradient(circle at 50% 56%,rgba(255,228,160,.95),rgba(255,210,120,0) 62%)}
+.stage-flash.on{animation:flashon .35s ease-out}
+.stage-flash.big{animation:flashbig .6s ease-out}
+@keyframes flashon{0%{opacity:.45}100%{opacity:0}}
+@keyframes flashbig{0%{opacity:1}40%{opacity:.7}100%{opacity:0}}
+
 @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none}.kenburns,.mtrack,.dust i,.slide.active,.trailer-bg,.tw.active{animation:none}.tw:first-child{opacity:1}}
