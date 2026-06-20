@@ -27,7 +27,7 @@
       <div class="player-profile opponent">
         <div class="avatar cpu-avatar">🛡️</div>
         <div class="profile-info">
-          <span class="player-name" id="opponentName">Centurion AI</span>
+          <span class="player-name" id="opponentName">Sultan AI</span>
           <span class="player-title" id="opponentTitle">MEDIUM BOT</span>
         </div>
         <div class="captured-box" id="cpuCapturedBox"></div>
@@ -42,7 +42,7 @@
       <div class="player-profile user">
         <div class="avatar user-avatar">🏛️</div>
         <div class="profile-info">
-          <span class="player-name">Strategist (You)</span>
+          <span class="player-name">Sultan (You)</span>
           <span class="player-title">RANK V</span>
         </div>
         <div class="captured-box" id="userCapturedBox"></div>
@@ -97,7 +97,7 @@
         <button class="btn btn-ghost" id="undo">↩ Undo</button>
       </div>
 
-      <p class="hint">Placement Phase: Alternate placing 2 soldiers at a time. The center Citadel must stay empty. Once all 48 soldiers are placed, the play phase starts!</p>
+      <p class="hint">Placement Phase: Alternate placing 2 soldiers. Center Citadel must stay empty. Once all 48 soldiers are placed, the play phase starts!</p>
     </aside>
   </div>
 
@@ -114,10 +114,10 @@
   <div class="wrap">
     <h2>How to play</h2>
     <div class="steps">
-      <div class="step"><div class="diagram d-move"></div><h3>Move</h3><p>Slide a soldier one square — up, down, left or right. Never diagonally.</p></div>
-      <div class="step"><div class="diagram d-cap"></div><h3>Surround</h3><p>Trap an enemy between two of yours on a line, and it's captured.</p></div>
-      <div class="step"><div class="diagram d-combo"></div><h3>Multi-capture</h3><p>A single move can capture several enemies at once.</p></div>
-      <div class="step"><div class="diagram d-crown"></div><h3>Centurion</h3><p>Your 7th capture promotes that soldier to a Centurion — it slides any distance to break the board open.</p></div>
+      <div class="step"><div class="diagram d-move"></div><h3>Move</h3><p>Slide a soldier one square orthogonally — up, down, left or right. Never diagonally.</p></div>
+      <div class="step"><div class="diagram d-cap"></div><h3>Surround</h3><p>Trap an enemy between two of yours on a line (custodial capture), and it's captured.</p></div>
+      <div class="step"><div class="diagram d-combo"></div><h3>Multi-capture</h3><p>A single move can capture several enemies in adjacent lines.</p></div>
+      <div class="step"><div class="diagram d-crown"></div><h3>Mullah</h3><p>Your 7th capture promotes that soldier to a Mullah — it slides any distance orthogonally to strike.</p></div>
     </div>
   </div>
 </section>
@@ -131,9 +131,10 @@
       <li><b>Moving.</b> One soldier per turn moves a single square orthogonally into an empty cell.</li>
       <li><b>Capturing.</b> Move so an enemy is sandwiched between two of your soldiers on a row or column — it's removed. A move may trap several at once.</li>
       <li><b>Safe.</b> A soldier that moves <em>itself</em> between two enemies is not captured.</li>
-      <li><b>The Centurion.</b> When one of your soldiers makes your <em>7th capture</em>, it is promoted to a Centurion: it slides any number of empty squares in a straight line (like a rook), still capturing by the sandwich rule. Othman's own innovation to break the midgame open.</li>
-      <li><b>Winning.</b> Reduce the enemy to one soldier, or leave them with no legal move.</li>
-      <li><b>Pure skill.</b> No dice, no cards, no luck — descended from the Roman <em>Ludus Latrunculorum</em>.</li>
+      <li><b>The Mullah.</b> When one of your soldiers makes your <em>7th capture</em>, it is promoted to a Mullah: it slides any number of empty squares in a straight line orthogonally, capturing by the sandwich rule.</li>
+      <li><b>The Sultan.</b> Each player has one Sultan. It slides any number of empty squares orthogonally from the start. If your Sultan is captured (sandwiched), you lose immediately!</li>
+      <li><b>Winning.</b> Reduce the enemy to one soldier, capture their Sultan, or leave them with no legal move.</li>
+      <li><b>Pure skill.</b> No dice, no cards, no luck — traditional North African game of strategy.</li>
     </ul>
   </div>
 </section>

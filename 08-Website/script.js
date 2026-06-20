@@ -1,10 +1,9 @@
-// Kharbga — full game: classic rules + Centurion promotion + combos + minimax AI + Warlord Mode
+// Kharbga — full game: classic rules + Mullah promotion + combos + minimax AI + Sultan Mode
 (function(){
   'use strict';
   function $(id){return document.getElementById(id);}
   var N=7;
   var DIRS=[[1,0],[-1,0],[0,1],[0,-1]];
-  var DIRS8=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
   
   function idx(c,r){return r*N+c;} 
   function cc(i){return [i%N,(i/N|0)];}
@@ -14,8 +13,8 @@
     if(!v) return null;
     return v.startsWith('you') ? 'you' : 'cpu'; 
   }
-  function isCent(v){ return v === 'youC' || v === 'cpuC'; }
-  function isWarlord(v){ return v === 'youW' || v === 'cpuW'; }
+  function isCent(v){ return v === 'youC' || v === 'cpuC'; } // Mullah
+  function isWarlord(v){ return v === 'youW' || v === 'cpuW'; } // Sultan
   function opp(s){ return s==='you'?'cpu':'you'; }
   function pieces(b,s){var n=0;for(var i=0;i<b.length;i++)if(side(b[i])===s)n++;return n;}
 
@@ -27,9 +26,9 @@
     return ['A','B','C','D','E','F','G'][c] + (7 - r);
   }
 
-  // ---------- WARLORD HELPERS ----------
+  // ---------- SULTAN HELPERS ----------
   function getPlacementType(count) {
-    if(count === 0) return 'Warlord 👑';
+    if(count === 0) return 'Sultan 👑';
     return 'Soldier';
   }
 
@@ -41,16 +40,16 @@
     // Roman Standard Soldier (Laurel Wreath with Gladius)
     cpu: '<svg viewBox="0 0 24 24" fill="none" stroke="#c5b6a7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><path d="M5 15c-1-3-1-7 2-10a7 7 0 0 1 5-2"/><path d="M19 15c1-3 1-7-2-10a7 7 0 0 0-5-2"/><path d="M12 7v11M10 16h4"/></svg>',
     
-    // Carthage Centurion Promoted (Upgraded Tanit with sun rays / double crescent)
+    // Carthage Mullah Promoted (Upgraded Tanit with sun rays / double crescent)
     youC: '<svg viewBox="0 0 24 24" fill="none" stroke="#ffe066" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><circle cx="12" cy="5" r="2.5"/><path d="M5 9h14"/><path d="M12 9L6 17h12Z"/><path d="M3 20c5 2 13 2 18 0"/></svg>',
     
-    // Roman Centurion Promoted (Centurion Crest Helmet)
+    // Roman Mullah Promoted (Crest Helmet)
     cpuC: '<svg viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><path d="M8 5a4 4 0 0 1 8 0"/><path d="M5 11a7 7 0 0 0 14 0v3H5v-3z"/><path d="M12 11v6"/></svg>',
     
-    // Carthage Warlord (Golden Crown)
+    // Carthage Sultan (Golden Crown)
     youW: '<svg viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z" /><path d="M3 20h18" /></svg>',
     
-    // Roman Warlord (Imperial Silver & Crimson Crown)
+    // Roman Sultan (Imperial Silver & Crimson Crown)
     cpuW: '<svg viewBox="0 0 24 24" fill="none" stroke="#ee5253" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z" /><path d="M3 20h18" /></svg>'
   };
 
@@ -84,7 +83,7 @@
   }
 
   // ---------- SMART CPU PLACEMENT HEURISTICS ----------
-  function getCpuPlacementSlots(isWarlord) {
+  function getCpuPlacementSlots(isSultan) {
     var empty = [];
     for(var i=0; i<49; i++) {
       if(i === 24 || cells[i]) continue;
@@ -97,7 +96,7 @@
     if(empty.length === 0) {
       for(var i=0; i<49; i++) { if(i !== 24 && !cells[i]) empty.push(i); }
     }
-    if(isWarlord) {
+    if(isSultan) {
       var backRank = empty.filter(function(x) { return Math.floor(x / 7) === 0; });
       if(backRank.length > 0) return backRank;
       var secondRank = empty.filter(function(x) { return Math.floor(x / 7) === 1; });
@@ -122,7 +121,7 @@
     return empty;
   }
 
-  // ---------- RULES ENGINE (pure) ----------
+  // ---------- RULES ENGINE (pure custodial, orthogonal only) ----------
   function moveTargets(b,i){ 
     var v=b[i]; 
     if(!v)return []; 
@@ -134,27 +133,8 @@
       return []; 
     }
 
-    if(isWarlord(v)){
-      // Warlord: 1-step move in all 8 directions OR leap capture in all 8 directions
-      for(var k=0; k<8; k++){
-        var dx=DIRS8[k][0], dy=DIRS8[k][1];
-        var c1=p[0]+dx, r1=p[1]+dy;
-        if(inB(c1,r1)){
-          var t1=b[idx(c1,r1)];
-          if(!t1){
-            o.push(idx(c1,r1));
-          } else {
-            var c2=p[0]+2*dx, r2=p[1]+2*dy;
-            if(inB(c2,r2) && !b[idx(c2,r2)]){
-              o.push(idx(c2,r2));
-            }
-          }
-        }
-      }
-      return o;
-    }
-
-    if(isCent(v)){ 
+    if(isWarlord(v) || isCent(v)){ 
+      // Sultan & Mullah slide any number of squares orthogonally
       for(var k=0;k<4;k++){ 
         var c=p[0]+DIRS[k][0],r=p[1]+DIRS[k][1]; 
         while(inB(c,r)&&!b[idx(c,r)]){ 
@@ -164,6 +144,7 @@
         } 
       } 
     } else { 
+      // Standard Soldier moves 1 square orthogonally
       for(var k2=0;k2<4;k2++){ 
         var c2=p[0]+DIRS[k2][0],r2=p[1]+DIRS[k2][1]; 
         if(inB(c2,r2)&&!b[idx(c2,r2)]) o.push(idx(c2,r2)); 
@@ -178,25 +159,9 @@
 
     b[to]=v; 
     b[from]=null;
-    
-    if(isWarlord(v)){
-      var pFrom=cc(from);
-      var pTo=cc(to);
-      var dc=pTo[0]-pFrom[0];
-      var dr=pTo[1]-pFrom[1];
-      if(Math.abs(dc)===2 || Math.abs(dr)===2){
-        var midC=pFrom[0] + dc/2;
-        var midR=pFrom[1] + dr/2;
-        var midIdx=idx(midC, midR);
-        var midPiece=b[midIdx];
-        if(midPiece && side(midPiece)!==s){
-          got.push(midIdx);
-          b[midIdx]=null; 
-        }
-      }
-    }
 
     var p=cc(to);
+    // Standard custodial sandwich capture (orthogonal sandwiching)
     for(var k=0;k<4;k++){ 
       var ec=p[0]+DIRS[k][0],er=p[1]+DIRS[k][1];
       if(inB(ec,er)){ 
@@ -265,13 +230,13 @@
 
   function minimax(b,s,depth,a,bb,me){
     var o=opp(me);
-    var myWarlord=false, opWarlord=false;
+    var mySultan=false, opSultan=false;
     for(var i=0;i<b.length;i++){
-      if(b[i]===me+'W')myWarlord=true;
-      if(b[i]===o+'W')opWarlord=true;
+      if(b[i]===me+'W')mySultan=true;
+      if(b[i]===o+'W')opSultan=true;
     }
-    if(!myWarlord)return -99999;
-    if(!opWarlord)return 99999;
+    if(!mySultan)return -99999;
+    if(!opSultan)return 99999;
 
     if(pieces(b,'you')<=1||pieces(b,'cpu')<=1||depth===0)return evalB(b,me);
     var turns=genTurns(b,s); 
@@ -321,7 +286,7 @@
   var cells, turn, mode='cpu', playMode='direct', diff=2, selected=null, chaining=null, over=false, busy=false;
   var youCap=0, cpuCap=0, centYou=false, centCpu=false, turnCaps=0, lastFrom=-1, lastTo=-1, history=[];
   var phase='play', youPlaced=24, cpuPlaced=24, turnPlaced=0, firstMove=true, movesLog=[];
-  var cpuWarlordCaptured=false, youWarlordCaptured=false;
+  var cpuSultanCaptured=false, youSultanCaptured=false;
   var boardEl=$('board'), cellEls=[];
   
   function setup(){ 
@@ -338,8 +303,8 @@
     lastFrom=-1; 
     lastTo=-1; 
     history=[];
-    cpuWarlordCaptured=false; 
-    youWarlordCaptured=false;
+    cpuSultanCaptured=false; 
+    youSultanCaptured=false;
     movesLog=[];
     
     var oppTitle = $('opponentTitle'); 
@@ -348,7 +313,7 @@
     }
     var oppName = $('opponentName'); 
     if(oppName){ 
-      oppName.textContent = mode === 'pvp' ? 'Player 2' : 'Centurion AI'; 
+      oppName.textContent = mode === 'pvp' ? 'Player 2' : 'Sultan AI'; 
     }
     
     if (playMode === 'direct') {
@@ -360,8 +325,8 @@
           cells[i] = 'you';
         }
       }
-      cells[3] = 'cpuW';  
-      cells[45] = 'youW'; 
+      cells[3] = 'cpuW';  // CPU Sultan D7
+      cells[45] = 'youW'; // User Sultan D1
       
       phase = 'play';
       youPlaced = 24;
@@ -369,7 +334,7 @@
       turnPlaced = 0;
       firstMove = true;
       turn = 'you';
-      addLog('⚡ Direct Play initiated. Warlords stationed at back ranks.');
+      addLog('⚡ Direct Play initiated. Sultans stationed at back ranks.');
     } else {
       phase = 'placement';
       youPlaced = 0;
@@ -397,8 +362,8 @@
       tp:turnPlaced,
       fm:firstMove,
       ml:movesLog.slice(),
-      cW:cpuWarlordCaptured,
-      yW:youWarlordCaptured
+      cW:cpuSultanCaptured,
+      yW:youSultanCaptured
     }); 
   }
 
@@ -415,8 +380,8 @@
     turnPlaced=s.tp; 
     firstMove=s.fm; 
     movesLog=s.ml.slice(); 
-    cpuWarlordCaptured=s.cW; 
-    youWarlordCaptured=s.yW; 
+    cpuSultanCaptured=s.cW; 
+    youSultanCaptured=s.yW; 
     selected=null; 
     chaining=null; 
     over=false; 
@@ -531,12 +496,12 @@
         }
         else $('status').textContent='Enemy is placing soldiers…';
       }
-      if(hintEl) hintEl.innerHTML="<b>Placement Phase:</b> Alternate placing 2 soldiers. The first piece you place will be your <b>Warlord 👑</b> (capture = instant defeat!). The rest are standard soldiers. Center Citadel remains empty.";
+      if(hintEl) hintEl.innerHTML="<b>Placement Phase:</b> Alternate placing 2 soldiers. The first piece you place will be your <b>Sultan 👑</b> (capture = instant defeat!). The rest are standard soldiers. Center Citadel remains empty.";
     }else{
       $('status').textContent = mode==='pvp' ? (turn==='you'?'Light to move':'Dark to move') : (busy?'Enemy is thinking…':'Your move');
       if(hintEl){
         if(firstMove) hintEl.innerHTML="<b>First Move:</b> Light (You) must move a soldier adjacent to the Citadel into the Citadel to open the board.";
-        else hintEl.innerHTML="Glowing soldiers can move. Tap one, then tap a highlighted square. Trap an enemy between two of yours to capture — <b>keep capturing</b> for a combo. Promote to <b>Centurion 👑</b> at 7 captures. <b>Warlords 👑</b> can move orthogonally or diagonally, and leap-capture. Capture the enemy Warlord to win instantly!";
+        else hintEl.innerHTML="Glowing soldiers can move. Tap one, then tap a highlighted square. Trap an enemy between two of yours to capture (custodial capture). Promote to <b>Mullah 👑</b> at 7 captures. The <b>Sultan 👑</b> slides orthogonally from the start. Capture the enemy Sultan to win instantly!";
       }
     }
   }
@@ -560,8 +525,8 @@
     
     for(var g=0; g<caps.length; g++){
       var capturedPiece = originalCells[caps[g]];
-      if(capturedPiece === 'cpuW') cpuWarlordCaptured = true;
-      if(capturedPiece === 'youW') youWarlordCaptured = true;
+      if(capturedPiece === 'cpuW') cpuSultanCaptured = true;
+      if(capturedPiece === 'youW') youSultanCaptured = true;
     }
 
     var sideName = turn==='you' ? 'You' : (mode==='pvp'?'Player 2':'CPU');
@@ -577,8 +542,8 @@
     beep(caps.length?'cap':'move'); 
     render(caps,to);
     
-    if(cpuWarlordCaptured) { win('You captured the Enemy Warlord! 🏆'); return caps; }
-    if(youWarlordCaptured) { win(mode==='pvp'?'Player 2 captured your Warlord! 🏆':'Enemy captured your Warlord.'); return caps; }
+    if(cpuSultanCaptured) { win('You captured the enemy Sultan! 🏆'); return caps; }
+    if(youSultanCaptured) { win(mode==='pvp'?'Player 2 captured your Sultan! 🏆':'Enemy captured your Sultan.'); return caps; }
     
     return caps; 
   }
@@ -587,21 +552,21 @@
     if(turn==='you'&&!centYou&&youCap>=7&&cells[lastTo]&&side(cells[lastTo])==='you'&&!isWarlord(cells[lastTo])){ 
       cells[lastTo]='youC'; 
       centYou=true; 
-      pop('CENTURION! 👑',true); 
+      pop('MULLAH! 👑',true); 
       beep('win'); 
-      addLog('👑 You promoted a Centurion at '+coord(lastTo)+'!'); 
+      addLog('👑 You promoted a Mullah at '+coord(lastTo)+'!'); 
     }
     if(turn==='cpu'&&!centCpu&&cpuCap>=7&&cells[lastTo]&&side(cells[lastTo])==='cpu'&&!isWarlord(cells[lastTo])){ 
       cells[lastTo]='cpuC'; 
       centCpu=true; 
-      pop('ENEMY CENTURION! 👑',true); 
-      addLog('👑 CPU promoted a Centurion at '+coord(lastTo)+'!'); 
+      pop('ENEMY MULLAH! 👑',true); 
+      addLog('👑 CPU promoted a Mullah at '+coord(lastTo)+'!'); 
     }
   }
 
   function humanStep(from,to){ 
     var caps=step(from,to); 
-    var cont=caps.length&&!cpuWarlordCaptured&&!youWarlordCaptured?chainTargets(cells,to):[];
+    var cont=caps.length&&!cpuSultanCaptured&&!youSultanCaptured?chainTargets(cells,to):[];
     if(cont.length){ 
       chaining=to; 
       selected=to; 
@@ -610,9 +575,9 @@
     } else { 
       chaining=null; 
       selected=null; 
-      if(!cpuWarlordCaptured&&!youWarlordCaptured) maybePromote(); 
+      if(!cpuSultanCaptured&&!youSultanCaptured) maybePromote(); 
       render(); 
-      if(!cpuWarlordCaptured&&!youWarlordCaptured) endTurn(); 
+      if(!cpuSultanCaptured&&!youSultanCaptured) endTurn(); 
     } 
   }
 
@@ -646,7 +611,7 @@
     turnCaps=0; 
     var s=0; 
     (function next(){
-      if(cpuWarlordCaptured||youWarlordCaptured) return;
+      if(cpuSultanCaptured||youSultanCaptured) return;
       if(s>=t.steps.length){ 
         maybePromote(); 
         busy=false; 
@@ -684,15 +649,15 @@
 
   function aiPlace(){
     var pType1 = getPieceValue('cpu', cpuPlaced);
-    var isWarlord1 = pType1 === 'cpuW';
-    var slots1 = getCpuPlacementSlots(isWarlord1);
+    var isSultan1 = pType1 === 'cpuW';
+    var slots1 = getCpuPlacementSlots(isSultan1);
     var cell1 = slots1[Math.floor(Math.random() * slots1.length)];
     cells[cell1] = pType1;
     cpuPlaced++;
     
     var pType2 = getPieceValue('cpu', cpuPlaced);
-    var isWarlord2 = pType2 === 'cpuW';
-    var slots2 = getCpuPlacementSlots(isWarlord2);
+    var isSultan2 = pType2 === 'cpuW';
+    var slots2 = getCpuPlacementSlots(isSultan2);
     slots2 = slots2.filter(function(x) { return x !== cell1; });
     if(slots2.length === 0) {
       for(var i=0; i<49; i++) { if(i!==24 && i!==cell1 && !cells[i]) slots2.push(i); }
@@ -702,8 +667,8 @@
     cpuPlaced++;
     
     beep('move'); 
-    var name1 = pType1 === 'cpuW' ? 'Warlord' : 'Soldier';
-    var name2 = pType2 === 'cpuW' ? 'Warlord' : 'Soldier';
+    var name1 = pType1 === 'cpuW' ? 'Sultan' : 'Soldier';
+    var name2 = pType2 === 'cpuW' ? 'Sultan' : 'Soldier';
     addLog('CPU placed '+name1+' at '+coord(cell1)+' & '+name2+' at '+coord(cell2));
     render();
     
@@ -729,14 +694,14 @@
         else { youSlots.push(i); }
       }
     }
-    var youWarlordIndex = 42 + Math.floor(Math.random() * 7);
-    var cpuWarlordIndex = Math.floor(Math.random() * 7);
+    var youSultanIndex = 42 + Math.floor(Math.random() * 7);
+    var cpuSultanIndex = Math.floor(Math.random() * 7);
     
-    cells[youWarlordIndex] = 'youW';
-    cells[cpuWarlordIndex] = 'cpuW';
+    cells[youSultanIndex] = 'youW';
+    cells[cpuSultanIndex] = 'cpuW';
     
-    youSlots = youSlots.filter(function(x) { return x !== youWarlordIndex; });
-    cpuSlots = cpuSlots.filter(function(x) { return x !== cpuWarlordIndex; });
+    youSlots = youSlots.filter(function(x) { return x !== youSultanIndex; });
+    cpuSlots = cpuSlots.filter(function(x) { return x !== cpuSultanIndex; });
     
     for(var s=0; s<youSlots.length; s++) { cells[youSlots[s]] = 'you'; }
     for(var s=0; s<cpuSlots.length; s++) { cells[cpuSlots[s]] = 'cpu'; }
@@ -766,7 +731,7 @@
       turnPlaced++;
       if(turn==='you')youPlaced++; else cpuPlaced++;
       var sideName = turn==='you' ? 'You' : (mode==='pvp'?'Player 2':'CPU');
-      var nameString = pType === 'youW' || pType === 'cpuW' ? 'Warlord' : 'Soldier';
+      var nameString = pType === 'youW' || pType === 'cpuW' ? 'Sultan' : 'Soldier';
       addLog(sideName + ' placed ' + nameString + ' at ' + coord(i));
       beep('move'); 
       render();
