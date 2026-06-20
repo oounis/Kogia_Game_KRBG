@@ -36,6 +36,12 @@
         <button data-m="cpu" class="active">vs Computer</button>
         <button data-m="pvp">Pass &amp; Play</button>
       </div>
+      <div class="diff-wrap" id="diffWrap">
+        <span class="diff-label">Difficulty</span>
+        <div class="seg small" id="diffSeg">
+          <button data-d="1">Easy</button><button data-d="2" class="active">Medium</button><button data-d="3">Hard</button>
+        </div>
+      </div>
 
       <div class="turnbar">
         <span class="who" id="whoYou"><span class="chip light"></span> You</span>
@@ -50,11 +56,18 @@
 
       <div class="ctl-actions">
         <button class="btn" id="newGame">↻ New game</button>
-        <a href="#learn" class="btn btn-ghost">How to play</a>
+        <button class="btn btn-ghost" id="undo">↩ Undo</button>
       </div>
 
-      <p class="hint">Tap a soldier, then tap a highlighted square. Trap an enemy between two of yours on a line to capture it.</p>
+      <p class="hint">Tap a soldier, then tap a highlighted square. Trap an enemy between two of yours on a line to capture it — and <b>keep capturing</b> in a combo!</p>
     </aside>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="modal-card">
+      <div class="modal-msg" id="modalMsg"></div>
+      <button class="btn" id="rematch">↻ Rematch</button>
+    </div>
   </div>
 </main>
 

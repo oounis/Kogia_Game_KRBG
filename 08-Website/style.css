@@ -87,6 +87,17 @@ em{font-style:normal;color:var(--accent);font-weight:600}
 .footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding:26px 24px;border-top:1px solid var(--line);font-size:.85rem}
 .footer .brand{font-size:1rem}
 
+/* difficulty + modal */
+.diff-wrap{margin:-4px 0 16px}
+.diff-label{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);font-weight:700;margin-bottom:6px}
+.seg.small button{padding:7px;font-size:.82rem}
+.modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;background:rgba(43,39,34,.55);backdrop-filter:blur(3px)}
+.modal.show{display:flex;animation:fade .25s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.modal-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:34px 40px;text-align:center;box-shadow:0 20px 60px rgba(43,39,34,.3);animation:popin .3s;max-width:90vw}
+@keyframes popin{from{transform:scale(.9);opacity:0}to{transform:none;opacity:1}}
+.modal-msg{font-size:1.5rem;font-weight:800;margin-bottom:18px}
+
 @media(max-width:840px){
   .play-grid{grid-template-columns:1fr;gap:20px}
   .control{position:static}
