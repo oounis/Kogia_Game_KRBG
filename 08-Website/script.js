@@ -1,4 +1,4 @@
-// Kharbga — full game: classic rules + Centurion promotion + combos + minimax AI
+// Kharbga — full game: classic rules + Centurion promotion + combos + minimax AI + Special Pieces Mode
 (function(){
   'use strict';
   function $(id){return document.getElementById(id);}
@@ -7,7 +7,7 @@
   function inB(c,r){return c>=0&&c<N&&r>=0&&r<N;}
   function clone(b){return b.slice();}
   function side(v){ return v? (v.charAt(0)==='y'?'you':'cpu') : null; }
-  function isCent(v){ return v && v.length===4; }       // 'youC' / 'cpuC'
+  function isCent(v){ return v && (v === 'youC' || v === 'cpuC'); }
   function opp(s){ return s==='you'?'cpu':'you'; }
   function pieces(b,s){var n=0;for(var i=0;i<b.length;i++)if(side(b[i])===s)n++;return n;}
 
@@ -19,16 +19,60 @@
     return ['A','B','C','D','E','F','G'][c] + (7 - r);
   }
 
+  // ---------- SPECIAL PIECES HELPERS ----------
+  function getPlacementType(count) {
+    if(count === 0) return 'Emperor 👑';
+    if(count === 1) return 'Cavalry ♞';
+    if(count === 2) return 'Shield Guard 🛡️';
+    return 'Soldier';
+  }
+
+  function getPieceValue(s, count) {
+    if(count === 0) return s === 'you' ? 'youE' : 'cpuE';
+    if(count === 1) return s === 'you' ? 'youV' : 'cpuV';
+    if(count === 2) return s === 'you' ? 'youS' : 'cpuS';
+    return s;
+  }
+
+  function isProtected(b,i,s){
+    var p=cc(i);
+    var shield = s==='you'?'youS':'cpuS';
+    if(b[i] === shield) return false;
+    for(var k=0;k<4;k++){
+      var c=p[0]+DIRS[k][0],r=p[1]+DIRS[k][1];
+      if(inB(c,r)&&b[idx(c,r)]===shield) return true;
+    }
+    return false;
+  }
+
   // ---------- RULES ENGINE (pure) ----------
   function moveTargets(b,i){ var v=b[i]; if(!v)return []; var p=cc(i),o=[];
     if(firstMove){ if((i===17||i===23||i===25||i===31)&&!b[24])return [24]; return []; }
+    if(v==='youV'||v==='cpuV'){
+      for(var k=0;k<4;k++){
+        var c=p[0]+DIRS[k][0],r=p[1]+DIRS[k][1];
+        if(inB(c,r)){
+          if(!b[idx(c,r)]){ o.push(idx(c,r)); }
+          else {
+            var jc=c+DIRS[k][0],jr=r+DIRS[k][1];
+            if(inB(jc,jr)&&!b[idx(jc,jr)]){ o.push(idx(jc,jr)); }
+          }
+        }
+      }
+      return o;
+    }
     if(isCent(v)){ for(var k=0;k<4;k++){ var c=p[0]+DIRS[k][0],r=p[1]+DIRS[k][1]; while(inB(c,r)&&!b[idx(c,r)]){ o.push(idx(c,r)); c+=DIRS[k][0]; r+=DIRS[k][1]; } } }
     else { for(var k2=0;k2<4;k2++){ var c2=p[0]+DIRS[k2][0],r2=p[1]+DIRS[k2][1]; if(inB(c2,r2)&&!b[idx(c2,r2)])o.push(idx(c2,r2)); } }
     return o; }
+
   function applyStep(b,from,to){ var v=b[from],s=side(v); b[to]=v; b[from]=null; var p=cc(to),got=[];
     for(var k=0;k<4;k++){ var ec=p[0]+DIRS[k][0],er=p[1]+DIRS[k][1];
-      if(inB(ec,er)){ var e=b[idx(ec,er)]; if(e&&side(e)!==s){ var bc=ec+DIRS[k][0],br=er+DIRS[k][1]; if(inB(bc,br)&&b[idx(bc,br)]&&side(b[idx(bc,br)])===s) got.push(idx(ec,er)); } } }
+      if(inB(ec,er)){ var e=b[idx(ec,er)];
+        if(e&&side(e)!==s){ var eSide=side(e);
+          if(!isProtected(b,idx(ec,er),eSide)){ var bc=ec+DIRS[k][0],br=er+DIRS[k][1];
+            if(inB(bc,br)&&b[idx(bc,br)]&&side(b[idx(bc,br)])===s) got.push(idx(ec,er)); } } } }
     for(var g=0;g<got.length;g++) b[got[g]]=null; return got; }
+
   function chainTargets(b,i){ return moveTargets(b,i).filter(function(t){ var c=clone(b); return applyStep(c,i,t).length>0; }); }
   function genTurns(b,s){ var turns=[];
     for(var i=0;i<b.length;i++){ if(side(b[i])!==s)continue; var mt=moveTargets(b,i);
@@ -42,10 +86,20 @@
   // ---------- AI ----------
   function evalB(b,me){ var o=opp(me),mp=pieces(b,me),op=pieces(b,o); if(op<=1)return 99999; if(mp<=1)return -99999;
     return (mp-op)*100 + (genTurns(b,me).length-genTurns(b,o).length)*1.5; }
-  function minimax(b,s,depth,a,bb,me){ if(pieces(b,'you')<=1||pieces(b,'cpu')<=1||depth===0)return evalB(b,me);
-    var turns=genTurns(b,s); if(!turns.length)return s===me?-99999:99999; var o=opp(s);
-    if(s===me){ var best=-1e9; for(var k=0;k<turns.length;k++){ var v=minimax(turns[k].result,o,depth-1,a,bb,me); if(v>best)best=v; if(best>a)a=best; if(a>=bb)break; } return best; }
-    var bst=1e9; for(var j=0;j<turns.length;j++){ var v2=minimax(turns[j].result,o,depth-1,a,bb,me); if(v2<bst)bst=v2; if(bst<bb)bb=bst; if(a>=bb)break; } return bst; }
+  function minimax(b,s,depth,a,bb,me){
+    var o=opp(me);
+    var myEmp=false, opEmp=false;
+    for(var i=0;i<b.length;i++){
+      if(b[i]===me+'E')myEmp=true;
+      if(b[i]===o+'E')opEmp=true;
+    }
+    if(!myEmp)return -99999;
+    if(!opEmp)return 99999;
+
+    if(pieces(b,'you')<=1||pieces(b,'cpu')<=1||depth===0)return evalB(b,me);
+    var turns=genTurns(b,s); if(!turns.length)return s===me?-99999:99999; var ot=opp(s);
+    if(s===me){ var best=-1e9; for(var k=0;k<turns.length;k++){ var v=minimax(turns[k].result,ot,depth-1,a,bb,me); if(v>best)best=v; if(best>a)a=best; if(a>=bb)break; } return best; }
+    var bst=1e9; for(var j=0;j<turns.length;j++){ var v2=minimax(turns[j].result,ot,depth-1,a,bb,me); if(v2<bst)bst=v2; if(bst<bb)bb=bst; if(a>=bb)break; } return bst; }
   function aiPick(b,s,depth){ var turns=genTurns(b,s); if(!turns.length)return null;
     for(var k=turns.length-1;k>0;k--){var j=(Math.random()*(k+1))|0;var t=turns[k];turns[k]=turns[j];turns[j]=t;}
     var o=opp(s),best=turns[0],bs=-1e9;
@@ -56,22 +110,29 @@
   var cells, turn, mode='cpu', diff=2, selected=null, chaining=null, over=false, busy=false;
   var youCap=0, cpuCap=0, centYou=false, centCpu=false, turnCaps=0, lastFrom=-1, lastTo=-1, history=[];
   var phase='placement', youPlaced=0, cpuPlaced=0, turnPlaced=0, firstMove=true, movesLog=[];
+  var cpuEmpCaptured=false, youEmpCaptured=false;
   var boardEl=$('board'), cellEls=[];
   
   function setup(){ cells=new Array(49).fill(null);
     phase='placement'; turn='you'; youPlaced=0; cpuPlaced=0; turnPlaced=0; firstMove=true; movesLog=[];
     selected=null; chaining=null; over=false; busy=false; youCap=0; cpuCap=0; centYou=false; centCpu=false; turnCaps=0; lastFrom=-1; lastTo=-1; history=[];
+    cpuEmpCaptured=false; youEmpCaptured=false;
     var oppTitle = $('opponentTitle'); if(oppTitle){ oppTitle.textContent = diff === 1 ? 'EASY BOT' : (diff === 2 ? 'MEDIUM BOT' : 'EXPERT BOT'); }
     var oppName = $('opponentName'); if(oppName){ oppName.textContent = mode === 'pvp' ? 'Player 2' : 'Centurion AI'; }
     updateLog(); }
-  function snap(){ history.push({b:clone(cells),t:turn,yc:youCap,cc:cpuCap,cy:centYou,cp:centCpu,ph:phase,yp:youPlaced,cpP:cpuPlaced,tp:turnPlaced,fm:firstMove,ml:movesLog.slice()}); }
-  function restore(s){ cells=clone(s.b); turn=s.t; youCap=s.yc; cpuCap=s.cc; centYou=s.cy; centCpu=s.cp; phase=s.ph; youPlaced=s.yp; cpuPlaced=s.cpP; turnPlaced=s.tp; firstMove=s.fm; movesLog=s.ml.slice(); selected=null; chaining=null; over=false; busy=false; lastFrom=-1; lastTo=-1; updateLog(); }
+  function snap(){ history.push({b:clone(cells),t:turn,yc:youCap,cc:cpuCap,cy:centYou,cp:centCpu,ph:phase,yp:youPlaced,cpP:cpuPlaced,tp:turnPlaced,fm:firstMove,ml:movesLog.slice(),cE:cpuEmpCaptured,yE:youEmpCaptured}); }
+  function restore(s){ cells=clone(s.b); turn=s.t; youCap=s.yc; cpuCap=s.cc; centYou=s.cy; centCpu=s.cp; phase=s.ph; youPlaced=s.yp; cpuPlaced=s.cpP; turnPlaced=s.tp; firstMove=s.fm; movesLog=s.ml.slice(); cpuEmpCaptured=s.cE; youEmpCaptured=s.yE; selected=null; chaining=null; over=false; busy=false; lastFrom=-1; lastTo=-1; updateLog(); }
 
   function build(){ boardEl.innerHTML=''; cellEls=[];
     for(var i=0;i<49;i++){ var p=cc(i); var d=document.createElement('div');
       d.className='cell '+(((p[0]+p[1])%2)?'dk':'lt')+((p[0]===3&&p[1]===3)?' mid':'');
       d.setAttribute('data-i',i); d.addEventListener('click',onClick); boardEl.appendChild(d); cellEls.push(d); } }
-  function pcClass(v){ return 'pc '+side(v)+(isCent(v)?' cent':''); }
+  function pcClass(v){
+    var s = side(v);
+    var type = v.substring(3);
+    var typeClass = type === 'E' ? ' emp' : (type === 'V' ? ' cav' : (type === 'S' ? ' shield' : (isCent(v) ? ' cent' : '')));
+    return 'pc ' + s + typeClass;
+  }
   function render(captured,moveTo){ captured=captured||[];
     for(var i=0;i<cellEls.length;i++){ var el=cellEls[i],want=cells[i],pc=el.querySelector('.pc');
       if(want){ var cls=pcClass(want);
@@ -98,17 +159,21 @@
       var leftYou=24-youPlaced, leftCpu=24-cpuPlaced;
       if(mode==='pvp'){
         var pName=turn==='you'?'Light':'Dark';
-        $('status').textContent=pName+': Place '+(2-turnPlaced)+' soldier(s) ('+(turn==='you'?leftYou:leftCpu)+' left)';
+        var nextType = turn==='you' ? getPlacementType(youPlaced) : getPlacementType(cpuPlaced);
+        $('status').textContent=pName+': Place ' + nextType + ' ('+(turn==='you'?leftYou:leftCpu)+' left)';
       }else{
-        if(turn==='you')$('status').textContent='Place '+(2-turnPlaced)+' soldier(s) ('+leftYou+' left)';
+        if(turn==='you'){
+          var nextType = getPlacementType(youPlaced);
+          $('status').textContent='Place ' + nextType + ' ('+leftYou+' left)';
+        }
         else $('status').textContent='Enemy is placing soldiers…';
       }
-      if(hintEl) hintEl.innerHTML="<b>Placement Phase:</b> Alternate placing 2 soldiers at a time on any empty cell. The center Citadel must stay empty. Once all 48 soldiers are placed, the play phase starts!";
+      if(hintEl) hintEl.innerHTML="<b>Placement Phase:</b> Alternate placing 2 soldiers. The first three pieces you place will be your <b>Emperor 👑</b> (capture = instant defeat), <b>Cavalry ♞</b> (orthogonal jumper), and <b>Shield Guard 🛡️</b> (protects adjacent friendly units). The center Citadel must remain empty.";
     }else{
       $('status').textContent = mode==='pvp' ? (turn==='you'?'Light to move':'Dark to move') : (busy?'Enemy is thinking…':'Your move');
       if(hintEl){
         if(firstMove) hintEl.innerHTML="<b>First Move:</b> Light (You) must move a soldier adjacent to the Citadel into the Citadel to open the board.";
-        else hintEl.innerHTML="Glowing soldiers can move. Tap one, then tap a highlighted square. Trap an enemy between two of yours to capture — <b>keep capturing</b> for a combo. Reach <b>7 captures</b> and that soldier becomes a <b>Centurion 👑</b>.";
+        else hintEl.innerHTML="Glowing soldiers can move. Tap one, then tap a highlighted square. Trap an enemy between two of yours to capture — <b>keep capturing</b> for a combo. Reach <b>7 captures</b> and that soldier becomes a <b>Centurion 👑</b>. Capturing the Enemy Emperor 👑 results in an instant victory!";
       }
     }
   }
@@ -116,20 +181,37 @@
 
   // ---------- moves ----------
   var COMBO=['','','DOUBLE!','TRIPLE!','ONSLAUGHT!','ANNIHILATION!'];
-  function step(from,to){ var caps=applyStep(cells,from,to); if(turn==='you')youCap+=caps.length; else cpuCap+=caps.length;
+  function step(from,to){
+    var originalCells = clone(cells);
+    var caps=applyStep(cells,from,to);
+    if(turn==='you')youCap+=caps.length; else cpuCap+=caps.length;
     if(firstMove)firstMove=false;
+    
+    // Check if Emperor was captured
+    for(var g=0; g<caps.length; g++){
+      var capturedPiece = originalCells[caps[g]];
+      if(capturedPiece === 'cpuE') cpuEmpCaptured = true;
+      if(capturedPiece === 'youE') youEmpCaptured = true;
+    }
+
     var sideName = turn==='you' ? 'You' : (mode==='pvp'?'Player 2':'CPU');
     var capStr = caps.length ? ' (captured '+caps.length+')' : '';
     addLog(sideName + ': ' + coord(from) + ' ➔ ' + coord(to) + capStr);
+    
     if(caps.length){ turnCaps+=caps.length; if(turnCaps>=2) pop(COMBO[Math.min(turnCaps,5)]); }
-    lastFrom=from; lastTo=to; beep(caps.length?'cap':'move'); render(caps,to); return caps; }
+    lastFrom=from; lastTo=to; beep(caps.length?'cap':'move'); render(caps,to);
+    
+    if(cpuEmpCaptured) { win('You captured the Enemy Emperor! 🏆'); return caps; }
+    if(youEmpCaptured) { win(mode==='pvp'?'Player 2 captured your Emperor! 🏆':'Enemy captured your Emperor.'); return caps; }
+    
+    return caps; }
   function maybePromote(){ // 7 captures -> Centurion (the piece that just moved)
     if(turn==='you'&&!centYou&&youCap>=7&&cells[lastTo]&&side(cells[lastTo])==='you'){ cells[lastTo]='youC'; centYou=true; pop('CENTURION! 👑',true); beep('win'); addLog('👑 You promoted a Centurion at '+coord(lastTo)+'!'); }
     if(turn==='cpu'&&!centCpu&&cpuCap>=7&&cells[lastTo]&&side(cells[lastTo])==='cpu'){ cells[lastTo]='cpuC'; centCpu=true; pop('ENEMY CENTURION! 👑',true); addLog('👑 CPU promoted a Centurion at '+coord(lastTo)+'!'); }
   }
-  function humanStep(from,to){ var caps=step(from,to); var cont=caps.length?chainTargets(cells,to):[];
+  function humanStep(from,to){ var caps=step(from,to); var cont=caps.length&&!cpuEmpCaptured&&!youEmpCaptured?chainTargets(cells,to):[];
     if(cont.length){ chaining=to; selected=to; render(caps,to); $('status').textContent='Keep capturing! ⚔️'; }
-    else { chaining=null; selected=null; maybePromote(); render(); endTurn(); } }
+    else { chaining=null; selected=null; if(!cpuEmpCaptured&&!youEmpCaptured) maybePromote(); render(); if(!cpuEmpCaptured&&!youEmpCaptured) endTurn(); } }
   function endTurn(){ var o=opp(turn);
     if(pieces(cells,'cpu')<=1)return win('You win! 🏆');
     if(pieces(cells,'you')<=1)return win(mode==='pvp'?'Dark wins! 🏆':'Enemy wins.');
@@ -137,7 +219,9 @@
     turn=o; turnCaps=0; snap(); render();
     if(mode==='cpu'&&turn==='cpu'){ busy=true; hud(); setTimeout(aiTurn,420); } }
   function aiTurn(){ var t=aiPick(cells,'cpu',diff===1?1:diff===2?2:3); if(!t){ win('Enemy is blocked — You win! 🏆'); return; }
-    turnCaps=0; var s=0; (function next(){ if(s>=t.steps.length){ maybePromote(); busy=false; turn='you'; turnCaps=0; selected=null; chaining=null;
+    turnCaps=0; var s=0; (function next(){
+      if(cpuEmpCaptured||youEmpCaptured) return;
+      if(s>=t.steps.length){ maybePromote(); busy=false; turn='you'; turnCaps=0; selected=null; chaining=null;
         if(pieces(cells,'you')<=1)return win('Enemy wins.'); if(genTurns(cells,'you').length===0)return win('You are blocked — Enemy wins.'); snap(); render(); return; }
       var st=t.steps[s++]; turn='cpu'; step(st[0],st[1]); setTimeout(next,420); })(); }
   function win(msg){ over=true; selected=null; chaining=null; render(); $('status').textContent=msg; var m=$('modal'); if(m){ $('modalMsg').textContent=msg; m.classList.add('show'); } beep('win'); addLog('Game Over: ' + msg); }
@@ -147,8 +231,17 @@
     if(empty.length>=2){
       var idx1=Math.floor(Math.random()*empty.length); var cell1=empty[idx1]; empty.splice(idx1,1);
       var idx2=Math.floor(Math.random()*empty.length); var cell2=empty[idx2];
-      cells[cell1]='cpu'; cells[cell2]='cpu'; cpuPlaced+=2; beep('move'); 
-      addLog('CPU placed at '+coord(cell1)+' & '+coord(cell2));
+      
+      var pType1 = getPieceValue('cpu', cpuPlaced);
+      cells[cell1]=pType1; cpuPlaced++;
+      
+      var pType2 = getPieceValue('cpu', cpuPlaced);
+      cells[cell2]=pType2; cpuPlaced++;
+      
+      beep('move'); 
+      var name1 = pType1 === 'cpuE' ? 'Emperor' : (pType1 === 'cpuV' ? 'Cavalry' : (pType1 === 'cpuS' ? 'Shield Guard' : 'Soldier'));
+      var name2 = pType2 === 'cpuE' ? 'Emperor' : (pType2 === 'cpuV' ? 'Cavalry' : (pType2 === 'cpuS' ? 'Shield Guard' : 'Soldier'));
+      addLog('CPU placed '+name1+' at '+coord(cell1)+' & '+name2+' at '+coord(cell2));
       render();
     }
     turnPlaced=0;
@@ -164,10 +257,12 @@
     if(mode==='cpu'&&turn!=='you')return;
     if(phase==='placement'){
       if(i===24||cells[i])return;
-      cells[i]=turn; turnPlaced++;
+      var pType = turn==='you' ? getPieceValue('you', youPlaced) : getPieceValue('cpu', cpuPlaced);
+      cells[i]=pType; turnPlaced++;
       if(turn==='you')youPlaced++; else cpuPlaced++;
       var sideName = turn==='you' ? 'You' : (mode==='pvp'?'Player 2':'CPU');
-      addLog(sideName + ' placed at ' + coord(i));
+      var nameString = pType === 'youE' || pType === 'cpuE' ? 'Emperor' : (pType === 'youV' || pType === 'cpuV' ? 'Cavalry' : (pType === 'youS' || pType === 'cpuS' ? 'Shield Guard' : 'Soldier'));
+      addLog(sideName + ' placed ' + nameString + ' at ' + coord(i));
       beep('move'); render();
       if(turnPlaced===2){
         turnPlaced=0;

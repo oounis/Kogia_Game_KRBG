@@ -434,6 +434,55 @@ em {
   text-shadow: 0 1px 2px rgba(0,0,0,0.7);
 }
 
+.pc.emp::after {
+  content: "👑";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 1.15em;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+}
+.pc.you.emp {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 0 3px #d4af37, 0 0 16px rgba(212, 175, 55, 0.8);
+}
+.pc.cpu.emp {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 0 3px #ee5253, 0 0 16px rgba(238, 82, 83, 0.8);
+}
+
+.pc.cav::after {
+  content: "♞";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 1.1em;
+  color: #c5c6c9;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+}
+.pc.you.cav {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 0 2px #4bc0c0, 0 0 12px rgba(75, 192, 192, 0.6);
+}
+.pc.cpu.cav {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 0 2px #36a2eb, 0 0 12px rgba(54, 162, 235, 0.6);
+}
+
+.pc.shield::after {
+  content: "🛡️";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.95em;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+}
+.pc.you.shield {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 0 2px #4caf50, 0 0 12px rgba(76, 175, 80, 0.6);
+}
+.pc.cpu.shield {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 0 2px #8bc34a, 0 0 12px rgba(139, 195, 74, 0.6);
+}
+
 .pc.pop {
   animation: pop .28s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
