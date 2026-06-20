@@ -11,6 +11,14 @@
   function opp(s){ return s==='you'?'cpu':'you'; }
   function pieces(b,s){var n=0;for(var i=0;i<b.length;i++)if(side(b[i])===s)n++;return n;}
 
+  // ---------- ALGEBRAIC COORDINATES ----------
+  function coord(i) {
+    if(i===24) return 'Citadel';
+    var c = i % 7;
+    var r = Math.floor(i / 7);
+    return ['A','B','C','D','E','F','G'][c] + (7 - r);
+  }
+
   // ---------- RULES ENGINE (pure) ----------
   function moveTargets(b,i){ var v=b[i]; if(!v)return []; var p=cc(i),o=[];
     if(firstMove){ if((i===17||i===23||i===25||i===31)&&!b[24])return [24]; return []; }
@@ -47,13 +55,17 @@
   // ---------- UI STATE ----------
   var cells, turn, mode='cpu', diff=2, selected=null, chaining=null, over=false, busy=false;
   var youCap=0, cpuCap=0, centYou=false, centCpu=false, turnCaps=0, lastFrom=-1, lastTo=-1, history=[];
-  var phase='placement', youPlaced=0, cpuPlaced=0, turnPlaced=0, firstMove=true;
+  var phase='placement', youPlaced=0, cpuPlaced=0, turnPlaced=0, firstMove=true, movesLog=[];
   var boardEl=$('board'), cellEls=[];
+  
   function setup(){ cells=new Array(49).fill(null);
-    phase='placement'; turn='you'; youPlaced=0; cpuPlaced=0; turnPlaced=0; firstMove=true;
-    selected=null; chaining=null; over=false; busy=false; youCap=0; cpuCap=0; centYou=false; centCpu=false; turnCaps=0; lastFrom=-1; lastTo=-1; history=[]; }
-  function snap(){ history.push({b:clone(cells),t:turn,yc:youCap,cc:cpuCap,cy:centYou,cp:centCpu,ph:phase,yp:youPlaced,cpP:cpuPlaced,tp:turnPlaced,fm:firstMove}); }
-  function restore(s){ cells=clone(s.b); turn=s.t; youCap=s.yc; cpuCap=s.cc; centYou=s.cy; centCpu=s.cp; phase=s.ph; youPlaced=s.yp; cpuPlaced=s.cpP; turnPlaced=s.tp; firstMove=s.fm; selected=null; chaining=null; over=false; busy=false; lastFrom=-1; lastTo=-1; }
+    phase='placement'; turn='you'; youPlaced=0; cpuPlaced=0; turnPlaced=0; firstMove=true; movesLog=[];
+    selected=null; chaining=null; over=false; busy=false; youCap=0; cpuCap=0; centYou=false; centCpu=false; turnCaps=0; lastFrom=-1; lastTo=-1; history=[];
+    var oppTitle = $('opponentTitle'); if(oppTitle){ oppTitle.textContent = diff === 1 ? 'EASY BOT' : (diff === 2 ? 'MEDIUM BOT' : 'EXPERT BOT'); }
+    var oppName = $('opponentName'); if(oppName){ oppName.textContent = mode === 'pvp' ? 'Player 2' : 'Centurion AI'; }
+    updateLog(); }
+  function snap(){ history.push({b:clone(cells),t:turn,yc:youCap,cc:cpuCap,cy:centYou,cp:centCpu,ph:phase,yp:youPlaced,cpP:cpuPlaced,tp:turnPlaced,fm:firstMove,ml:movesLog.slice()}); }
+  function restore(s){ cells=clone(s.b); turn=s.t; youCap=s.yc; cpuCap=s.cc; centYou=s.cy; centCpu=s.cp; phase=s.ph; youPlaced=s.yp; cpuPlaced=s.cpP; turnPlaced=s.tp; firstMove=s.fm; movesLog=s.ml.slice(); selected=null; chaining=null; over=false; busy=false; lastFrom=-1; lastTo=-1; updateLog(); }
 
   function build(){ boardEl.innerHTML=''; cellEls=[];
     for(var i=0;i<49;i++){ var p=cc(i); var d=document.createElement('div');
@@ -70,6 +82,12 @@
     var hi=chaining!=null?chaining:selected;
     if(hi!=null){ cellEls[hi].classList.add('sel'); var tg=chaining!=null?chainTargets(cells,chaining):moveTargets(cells,selected);
       for(var t=0;t<tg.length;t++){ cellEls[tg[t]].classList.add('legal'); var c2=clone(cells); if(applyStep(c2,hi,tg[t]).length)cellEls[tg[t]].classList.add('take'); } }
+    
+    // Captured pieces rendering in Chess.com sidebar profiles
+    var uBox = $('userCapturedBox'), cBox = $('cpuCapturedBox');
+    if(uBox){ uBox.innerHTML = ''; for(var j=0; j<youCap; j++){ var s=document.createElement('span'); s.className='cap-stone dark'; uBox.appendChild(s); } }
+    if(cBox){ cBox.innerHTML = ''; for(var j=0; j<cpuCap; j++){ var s=document.createElement('span'); s.className='cap-stone light'; cBox.appendChild(s); } }
+
     // movable hint
     var myTurn = (phase==='play')&&!over&&!busy&&selected==null&&chaining==null&&(mode==='pvp'||turn==='you');
     for(var m=0;m<cells.length;m++){ var p2=cellEls[m].querySelector('.pc'); if(p2){ p2.classList.toggle('can', myTurn&&side(cells[m])===turn&&moveTargets(cells,m).length>0); } }
@@ -100,11 +118,14 @@
   var COMBO=['','','DOUBLE!','TRIPLE!','ONSLAUGHT!','ANNIHILATION!'];
   function step(from,to){ var caps=applyStep(cells,from,to); if(turn==='you')youCap+=caps.length; else cpuCap+=caps.length;
     if(firstMove)firstMove=false;
+    var sideName = turn==='you' ? 'You' : (mode==='pvp'?'Player 2':'CPU');
+    var capStr = caps.length ? ' (captured '+caps.length+')' : '';
+    addLog(sideName + ': ' + coord(from) + ' ➔ ' + coord(to) + capStr);
     if(caps.length){ turnCaps+=caps.length; if(turnCaps>=2) pop(COMBO[Math.min(turnCaps,5)]); }
     lastFrom=from; lastTo=to; beep(caps.length?'cap':'move'); render(caps,to); return caps; }
   function maybePromote(){ // 7 captures -> Centurion (the piece that just moved)
-    if(turn==='you'&&!centYou&&youCap>=7&&cells[lastTo]&&side(cells[lastTo])==='you'){ cells[lastTo]='youC'; centYou=true; pop('CENTURION! 👑',true); beep('win'); }
-    if(turn==='cpu'&&!centCpu&&cpuCap>=7&&cells[lastTo]&&side(cells[lastTo])==='cpu'){ cells[lastTo]='cpuC'; centCpu=true; pop('ENEMY CENTURION! 👑',true); }
+    if(turn==='you'&&!centYou&&youCap>=7&&cells[lastTo]&&side(cells[lastTo])==='you'){ cells[lastTo]='youC'; centYou=true; pop('CENTURION! 👑',true); beep('win'); addLog('👑 You promoted a Centurion at '+coord(lastTo)+'!'); }
+    if(turn==='cpu'&&!centCpu&&cpuCap>=7&&cells[lastTo]&&side(cells[lastTo])==='cpu'){ cells[lastTo]='cpuC'; centCpu=true; pop('ENEMY CENTURION! 👑',true); addLog('👑 CPU promoted a Centurion at '+coord(lastTo)+'!'); }
   }
   function humanStep(from,to){ var caps=step(from,to); var cont=caps.length?chainTargets(cells,to):[];
     if(cont.length){ chaining=to; selected=to; render(caps,to); $('status').textContent='Keep capturing! ⚔️'; }
@@ -119,14 +140,16 @@
     turnCaps=0; var s=0; (function next(){ if(s>=t.steps.length){ maybePromote(); busy=false; turn='you'; turnCaps=0; selected=null; chaining=null;
         if(pieces(cells,'you')<=1)return win('Enemy wins.'); if(genTurns(cells,'you').length===0)return win('You are blocked — Enemy wins.'); snap(); render(); return; }
       var st=t.steps[s++]; turn='cpu'; step(st[0],st[1]); setTimeout(next,420); })(); }
-  function win(msg){ over=true; selected=null; chaining=null; render(); $('status').textContent=msg; var m=$('modal'); if(m){ $('modalMsg').textContent=msg; m.classList.add('show'); } beep('win'); }
+  function win(msg){ over=true; selected=null; chaining=null; render(); $('status').textContent=msg; var m=$('modal'); if(m){ $('modalMsg').textContent=msg; m.classList.add('show'); } beep('win'); addLog('Game Over: ' + msg); }
 
   function aiPlace(){
     var empty=[]; for(var i=0;i<49;i++){ if(i!==24&&!cells[i])empty.push(i); }
     if(empty.length>=2){
       var idx1=Math.floor(Math.random()*empty.length); var cell1=empty[idx1]; empty.splice(idx1,1);
       var idx2=Math.floor(Math.random()*empty.length); var cell2=empty[idx2];
-      cells[cell1]='cpu'; cells[cell2]='cpu'; cpuPlaced+=2; beep('move'); render();
+      cells[cell1]='cpu'; cells[cell2]='cpu'; cpuPlaced+=2; beep('move'); 
+      addLog('CPU placed at '+coord(cell1)+' & '+coord(cell2));
+      render();
     }
     turnPlaced=0;
     if(youPlaced+cpuPlaced===48){
@@ -143,6 +166,8 @@
       if(i===24||cells[i])return;
       cells[i]=turn; turnPlaced++;
       if(turn==='you')youPlaced++; else cpuPlaced++;
+      var sideName = turn==='you' ? 'You' : (mode==='pvp'?'Player 2':'CPU');
+      addLog(sideName + ' placed at ' + coord(i));
       beep('move'); render();
       if(turnPlaced===2){
         turnPlaced=0;
@@ -166,6 +191,13 @@
   function newGame(){ setup(); snap(); render(); var m=$('modal'); if(m)m.classList.remove('show'); }
   function undo(){ if(busy)return; var n=mode==='cpu'?2:1; if(history.length<=n){ newGame(); return; }
     history.splice(-n); restore(history[history.length-1]); render(); var m=$('modal'); if(m)m.classList.remove('show'); }
+
+  function addLog(txt){ movesLog.push(txt); updateLog(); }
+  function updateLog(){ var logEl = $('moveLog'); if(!logEl) return;
+    if(movesLog.length === 0){ logEl.innerHTML = '<div class="empty-log">Drop 2 soldiers to begin the placement phase.</div>'; return; }
+    logEl.innerHTML = ''; for(var i=0; i<movesLog.length; i++){ var d = document.createElement('div');
+      d.className = 'log-item'; d.textContent = movesLog[i]; logEl.appendChild(d); }
+    logEl.scrollTop = logEl.scrollHeight; }
 
   var ac; function beep(type){ try{ if(!ac)ac=new (window.AudioContext||window.webkitAudioContext)();
     var seq=type==='win'?[523,659,784]:type==='cap'?[210]:[440];

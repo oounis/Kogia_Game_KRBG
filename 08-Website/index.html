@@ -3,18 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kharbga — Play the Ancient Game of Pure Strategy</title>
-<meta name="description" content="Play Kharbga online — the 2,500-year-old North-African strategy game. Surround and capture, no luck. Play vs the computer or a friend, free.">
-<meta name="theme-color" content="#f4f2ec">
+<title>Kharbga: Origins — The Ancient North-African Strategy Game</title>
+<meta name="description" content="Play Kharbga online — the 2,500-year-old strategy game of Carthage and Rome. Placement phase, custodial captures, and Centurion upgrades. Pure skill, zero luck.">
+<meta name="theme-color" content="#0d0a08">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header class="nav">
-  <a href="#" class="brand">◆ Kharbga</a>
+  <a href="#" class="brand">◆ KHARBGA</a>
   <nav class="nav-links"><a href="#play" class="active">Play</a><a href="#learn">Learn</a><a href="#rules">Rules</a></nav>
   <a href="#play" class="btn btn-sm" id="navPlay">Play Now</a>
 </header>
@@ -23,20 +23,41 @@
 <main class="play" id="play">
   <div class="play-grid">
     <section class="board-area">
+      <!-- Opponent Profile -->
+      <div class="player-profile opponent">
+        <div class="avatar cpu-avatar">🛡️</div>
+        <div class="profile-info">
+          <span class="player-name" id="opponentName">Centurion AI</span>
+          <span class="player-title" id="opponentTitle">MEDIUM BOT</span>
+        </div>
+        <div class="captured-box" id="cpuCapturedBox"></div>
+      </div>
+      
       <div class="board-frame">
         <div class="board" id="board" aria-label="Kharbga board"></div>
         <div class="board-pop" id="boardPop"></div>
       </div>
+
+      <!-- Human Profile -->
+      <div class="player-profile user">
+        <div class="avatar user-avatar">🏛️</div>
+        <div class="profile-info">
+          <span class="player-name">Strategist (You)</span>
+          <span class="player-title">RANK V</span>
+        </div>
+        <div class="captured-box" id="userCapturedBox"></div>
+      </div>
     </section>
 
     <aside class="control">
-      <h1 class="ctl-title">Kharbga</h1>
-      <p class="ctl-sub">Surround. Capture. Conquer.</p>
+      <h1 class="ctl-title">KHARBGA</h1>
+      <p class="ctl-sub">Surround · Capture · Conquer</p>
 
       <div class="seg" id="modeSeg">
         <button data-m="cpu" class="active">vs Computer</button>
         <button data-m="pvp">Pass &amp; Play</button>
       </div>
+      
       <div class="diff-wrap" id="diffWrap">
         <span class="diff-label">Difficulty</span>
         <div class="seg small" id="diffSeg">
@@ -46,13 +67,20 @@
 
       <div class="turnbar">
         <span class="who" id="whoYou"><span class="chip light"></span> You</span>
-        <span class="status" id="status">Your move</span>
+        <span class="status" id="status">Placing...</span>
         <span class="who" id="whoCpu">Enemy <span class="chip dark"></span></span>
       </div>
 
-      <div class="scores">
+      <div class="scores" style="display:none;">
         <div class="score"><span class="chip light"></span> You captured <b id="youCap">0</b></div>
         <div class="score"><span class="chip dark"></span> Enemy captured <b id="cpuCap">0</b></div>
+      </div>
+
+      <div class="move-history">
+        <span class="history-label">Battle Log</span>
+        <div class="move-log" id="moveLog">
+          <div class="empty-log">Drop 2 soldiers to begin the placement phase.</div>
+        </div>
       </div>
 
       <div class="ctl-actions">
@@ -60,7 +88,7 @@
         <button class="btn btn-ghost" id="undo">↩ Undo</button>
       </div>
 
-      <p class="hint">Glowing soldiers can move. Tap one, then tap a highlighted square. Trap an enemy between two of yours to capture — <b>keep capturing</b> for a combo. Reach <b>7 captures</b> and that soldier becomes a <b>Centurion 👑</b> that slides across the board like a rook.</p>
+      <p class="hint">Placement Phase: Alternate placing 2 soldiers at a time. The center Citadel must stay empty. Once all 48 soldiers are placed, the play phase starts!</p>
     </aside>
   </div>
 
