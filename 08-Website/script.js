@@ -168,6 +168,15 @@
     var kio=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting&&!kstarted){kstarted=true;kplay();kio.disconnect();}});},{threshold:.3}); kio.observe(kb);
   }
 
+  // ---- combo trailer word-beats ----
+  var tw=document.querySelectorAll('.tw');
+  if(tw.length){ var ti=-1;
+    function nextWord(){ tw.forEach(function(w){ w.classList.remove('active'); });
+      ti=(ti+1)%tw.length; var el=tw[ti]; void el.offsetWidth; el.classList.add('active'); }
+    var twio=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ nextWord(); setInterval(nextWord,1950); twio.disconnect(); } }); },{threshold:.3});
+    twio.observe(tw[0]);
+  }
+
   // ---- email signup (stub; wire to a real service later) ----
   var form=$('signupForm'), msg=$('signupMsg');
   if(form){ form.addEventListener('submit', function(ev){ ev.preventDefault();
