@@ -3,39 +3,39 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kharbga: Origins — The Desert's Oldest Game of Pure Strategy</title>
-<meta name="description" content="Kharbga: Origins — a 2,500-year-old North-African strategy game of pure skill, no luck. Surround, capture, and crown your Centurion. By Kogia Games.">
-<meta name="theme-color" content="#f7f1e6">
+<title>Kharbga: Origins — The Ancient Game of Carthage & Rome</title>
+<meta name="description" content="Kharbga: Origins — a 2,500-year-old strategy game from the age of Carthage and Rome. Pure skill, no luck. Rotate the board, move the soldiers, learn by playing. By Kogia Games.">
+<meta name="theme-color" content="#1f0f3a">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header class="nav" id="nav">
-  <a href="#top" class="brand">KHARBGA</a>
-  <nav class="nav-links"><a href="#about">The Game</a><a href="#rules">Rules</a><a href="#story">Story</a><a href="#download">Play</a></nav>
+  <a href="#top" class="brand">❖ KHARBGA</a>
+  <nav class="nav-links"><a href="#play">Play</a><a href="#about">The Game</a><a href="#rules">Rules</a><a href="#story">Story</a></nav>
+  <a href="#download" class="btn btn-sm">Get the Game</a>
 </header>
 
 <!-- HERO -->
 <section class="hero" id="top">
+  <div class="ornament o1"></div><div class="ornament o2"></div>
   <div class="wrap hero-grid">
     <div class="hero-text">
-      <p class="kicker reveal">Kogia Games · Est. 530 BCE</p>
-      <h1 class="reveal" style="--d:.05s">Kharbga<span class="serif-i">: Origins</span></h1>
-      <p class="lead reveal" style="--d:.12s">The desert's oldest game of <em>pure strategy</em>. Two armies, one board, no luck —
-        only the sharper mind. Two and a half thousand years old, reborn for your pocket.</p>
-      <div class="hero-cta reveal" style="--d:.2s">
-        <a href="#download" class="btn">Play Free</a>
-        <a href="#rules" class="btn btn-ghost">Learn the Rules</a>
+      <p class="kicker reveal">Kogia Games · From Carthage to Rome · Est. 530 BCE</p>
+      <h1 class="reveal" style="--d:.05s"><span class="foil">KHARBGA</span><span class="sub">ORIGINS</span></h1>
+      <p class="lead reveal" style="--d:.14s">The desert's oldest game of pure strategy — played by Punic merchants and Roman
+        legionaries alike. Two armies, one board, <em>no luck</em>. Only the sharper mind conquers.</p>
+      <div class="hero-cta reveal" style="--d:.22s">
+        <a href="#play" class="btn">Touch the Board ↓</a>
+        <a href="#download" class="btn btn-ghost">Play Free</a>
       </div>
     </div>
-    <div class="hero-art reveal" style="--d:.25s" aria-hidden="true">
-      <div class="grid7" id="grid7"></div>
-    </div>
+    <div class="hero-emblem reveal" style="--d:.28s" aria-hidden="true"><div class="grid7" id="grid7"></div></div>
   </div>
-  <div class="scroll-cue">scroll ↓</div>
+  <div class="scroll-cue">scroll ▾</div>
 </section>
 
 <!-- FACTS -->
@@ -48,47 +48,60 @@
   </div>
 </section>
 
+<!-- INTERACTIVE BOARD -->
+<section class="section marble" id="play">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="sec-no">❖</span><h2>Touch the Board</h2>
+      <p class="sec-lead">No videos. <b>Rotate it, zoom it, move the soldiers yourself.</b> The tutorial is the game.</p></div>
+    <div class="lab reveal">
+      <div class="lab-tabs" id="labTabs">
+        <button class="lab-tab active" data-t="0">I · Moves</button>
+        <button class="lab-tab" data-t="1">II · Captures</button>
+        <button class="lab-tab" data-t="2">III · Winning</button>
+        <button class="lab-tab" data-t="3">IV · Strategy</button>
+      </div>
+      <div class="lab-grid">
+        <div class="lab-canvas-wrap">
+          <canvas id="scene3d"></canvas>
+          <div class="scene3d-fallback" id="scene3dFallback">3D needs a WebGL browser 🎮</div>
+          <div class="lab-hint">✋ drag = rotate · scroll = zoom · tap a soldier</div>
+        </div>
+        <div class="lab-hud">
+          <div class="lab-step" id="labStep">Tutorial I — Moves</div>
+          <p class="lab-instr" id="labInstr">Tap the glowing gold soldier, then tap a marked square to move it.</p>
+          <p class="lab-feedback" id="labFeedback">&nbsp;</p>
+          <button class="btn" id="labReset">↺ Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ABOUT -->
 <section class="section" id="about">
   <div class="wrap two">
     <div class="reveal"><span class="sec-no">01</span><h2>Older than chess.<br>Pure as mathematics.</h2></div>
     <div class="reveal" style="--d:.08s">
-      <p>Kharbga descends from the Roman <em>Ludus Latrunculorum</em> — "the game of soldiers" — played by legionaries
-        across the empire. For centuries it lived on in the sand of southern Tunisia, drawn with a stick, played with stones.</p>
-      <p>It belongs to the same noble family as chess and Go: no dice, no cards, no chance. You win by thinking further than
-        your rival. We've kept that soul exactly — and added a modern edge.</p>
+      <p>Kharbga descends from the Roman <em>Ludus Latrunculorum</em> — "the game of soldiers" — a favourite of legionaries
+        from Carthage to Hadrian's Wall. For centuries it lived on in the Tunisian south, drawn in sand, played with stones.</p>
+      <p>It belongs to the noble no-luck family of chess and Go: no dice, no chance. You win by thinking further than your
+        rival. We kept that soul exactly — and forged a modern edge.</p>
     </div>
   </div>
 </section>
 
-<div class="rule-line"></div>
-
 <!-- RULES -->
-<section class="section" id="rules">
+<section class="section marble" id="rules">
   <div class="wrap">
     <div class="reveal"><span class="sec-no">02</span><h2>How it works</h2></div>
     <div class="steps">
-      <div class="step reveal">
-        <div class="diagram d-move" aria-hidden="true"></div>
-        <h3>Move</h3><p>Slide a soldier one square — up, down, left or right. Never diagonally. Simple to learn.</p>
-      </div>
-      <div class="step reveal" style="--d:.08s">
-        <div class="diagram d-cap" aria-hidden="true"></div>
-        <h3>Surround</h3><p>Trap an enemy between two of your soldiers on a line, and it falls. The heart of Kharbga.</p>
-      </div>
-      <div class="step reveal" style="--d:.16s">
-        <div class="diagram d-combo" aria-hidden="true"></div>
-        <h3>Chain</h3><p>One capture lets the same soldier strike again — build a combo and clear a whole line.</p>
-      </div>
-      <div class="step reveal" style="--d:.24s">
-        <div class="diagram d-crown" aria-hidden="true"></div>
-        <h3>Crown</h3><p>Seven captures and your soldier is promoted to a <em>Centurion</em> that rules the board.</p>
-      </div>
+      <div class="step reveal"><div class="diagram d-move"></div><h3>Move</h3><p>Slide a soldier one square — orthogonally, never diagonally.</p></div>
+      <div class="step reveal" style="--d:.08s"><div class="diagram d-cap"></div><h3>Surround</h3><p>Trap an enemy between two of yours on a line, and it falls.</p></div>
+      <div class="step reveal" style="--d:.16s"><div class="diagram d-combo"></div><h3>Chain</h3><p>One capture lets the same soldier strike again — combo!</p></div>
+      <div class="step reveal" style="--d:.24s"><div class="diagram d-crown"></div><h3>Crown</h3><p>Seven captures and your soldier becomes a <em>Centurion</em>.</p></div>
     </div>
   </div>
 </section>
-
-<div class="rule-line"></div>
 
 <!-- STORY -->
 <section class="section" id="story">
@@ -96,17 +109,15 @@
     <div class="reveal"><span class="sec-no">03</span><h2>2,500 years,<br>one game.</h2></div>
     <div class="timeline reveal" style="--d:.08s">
       <div class="t"><b>530 BCE</b><p>A Greek vase shows Achilles at the board — <em>Petteia</em>, the ancestor.</p></div>
-      <div class="t"><b>1st c. BCE</b><p>Rome plays <em>Ludus Latrunculorum</em>, "the game of soldiers," from Hadrian's Wall to Carthage.</p></div>
-      <div class="t"><b>11th c.</b><p>Carried across North Africa, it takes root in the Tunisian south — Tataouine, Gafsa, Djerba.</p></div>
-      <div class="t"><b>Today</b><p>Elders still draw it in the sand. Now reborn by <strong>Kogia Games</strong> for the world.</p></div>
+      <div class="t"><b>1st c. BCE</b><p>Rome plays <em>Ludus Latrunculorum</em> from Carthage to the northern frontier.</p></div>
+      <div class="t"><b>11th c.</b><p>Carried across North Africa, it roots in the Tunisian south — Tataouine, Gafsa, Djerba.</p></div>
+      <div class="t"><b>Today</b><p>Elders still draw it in the sand. Now reborn by <strong>Kogia Games</strong>.</p></div>
     </div>
   </div>
 </section>
 
-<div class="rule-line"></div>
-
 <!-- VARIANTS -->
-<section class="section" id="variants">
+<section class="section marble" id="variants">
   <div class="wrap">
     <div class="reveal"><span class="sec-no">04</span><h2>One game, many names</h2></div>
     <div class="regions">
@@ -115,28 +126,23 @@
       <div class="region reveal" style="--d:.1s"><b>Libya</b><span>Siza</span></div>
       <div class="region reveal" style="--d:.15s"><b>Egypt</b><span>Seega · 5×5</span></div>
     </div>
-    <p class="region-note reveal">A living thread of North-African heritage — collected, preserved, and brought back to life.</p>
   </div>
 </section>
 
 <!-- DOWNLOAD -->
 <section class="cta" id="download">
   <div class="wrap center">
-    <h2 class="reveal">Be first to play.</h2>
-    <p class="cta-sub reveal" style="--d:.06s">Coming free to iPhone, Android &amp; web. Leave your email and we'll send the download the day it launches.</p>
-    <form class="signup reveal" style="--d:.12s" id="signupForm">
-      <input type="email" id="email" placeholder="your@email.com" required aria-label="email">
-      <button class="btn" type="submit">Notify Me</button>
-    </form>
+    <h2 class="reveal"><span class="foil">Be first to play.</span></h2>
+    <p class="cta-sub reveal" style="--d:.06s">Coming free to iPhone, Android &amp; web. Leave your email — we'll send the download the day it launches.</p>
+    <form class="signup reveal" style="--d:.12s" id="signupForm"><input type="email" id="email" placeholder="your@email.com" required aria-label="email"><button class="btn" type="submit">Notify Me</button></form>
     <p class="signup-msg" id="signupMsg"></p>
   </div>
 </section>
 
-<footer class="footer">
-  <span class="brand">KHARBGA</span>
-  <span class="muted">© 2026 Kogia Games · Pure skill, zero luck</span>
-</footer>
+<footer class="footer"><span class="brand">❖ KHARBGA</span><span class="muted">© 2026 Kogia Games · From Carthage to your pocket</span></footer>
 
 <script src="script.js"></script>
+<script src="vendor/three.min.js"></script>
+<script src="scene.js"></script>
 </body>
 </html>
