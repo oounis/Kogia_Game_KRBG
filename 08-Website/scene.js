@@ -135,8 +135,8 @@ try {
   const key=new THREE.DirectionalLight(0xfff4e2,0.95); key.position.set(4,9,5); key.castShadow=true;
   key.shadow.mapSize.set(1024,1024); key.shadow.radius=4; key.shadow.bias=-0.0006; key.shadow.camera.near=1; key.shadow.camera.far=36;
   key.shadow.camera.left=-7; key.shadow.camera.right=7; key.shadow.camera.top=7; key.shadow.camera.bottom=-7; scene.add(key);
-  scene.add(Object.assign(new THREE.PointLight(0xffd089,0.5,24),{position:new THREE.Vector3(-5,4,3)}));
-  scene.add(Object.assign(new THREE.PointLight(0xffb060,0.4,24),{position:new THREE.Vector3(5,4,-3)}));
+  const pl1 = new THREE.PointLight(0xffd089,0.5,24); pl1.position.set(-5,4,3); scene.add(pl1);
+  const pl2 = new THREE.PointLight(0xffb060,0.4,24); pl2.position.set(5,4,-3); scene.add(pl2);
   clock=new THREE.Clock(); buildBoard();
   if(fallback) fallback.style.display='none';
   resize(); window.addEventListener('resize',resize); if(window.ResizeObserver) new ResizeObserver(resize).observe(canvas);
