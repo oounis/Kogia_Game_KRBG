@@ -46,7 +46,7 @@ a{color:inherit;text-decoration:none}
 
 /* board */
 .board-frame{position:relative;margin:.6rem 0}
-.board{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;background:#EDE6FB;padding:8px;border-radius:18px;aspect-ratio:1/1}
+.board{display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:repeat(7,1fr);gap:5px;background:#EDE6FB;padding:8px;border-radius:18px;aspect-ratio:1/1}
 .cell{position:relative;border-radius:9px;display:grid;place-items:center;cursor:pointer;transition:.12s;background:#FAF7FF}
 .cell.dk{background:#F0EAFB}
 .cell.lt{background:#FBF9FF}
