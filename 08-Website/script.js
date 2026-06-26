@@ -34,23 +34,23 @@
 
   // ---------- VECTOR PIECE GRAPHICS ----------
   var SVGS = {
-    // Carthage Standard Soldier (Sign of Tanit)
-    you: '<svg viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><circle cx="12" cy="6" r="3"/><path d="M5 11h14"/><path d="M12 11L6 20h12Z"/></svg>',
-    
-    // Roman Standard Soldier (Laurel Wreath with Gladius)
-    cpu: '<svg viewBox="0 0 24 24" fill="none" stroke="#c5b6a7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><path d="M5 15c-1-3-1-7 2-10a7 7 0 0 1 5-2"/><path d="M19 15c1-3 1-7-2-10a7 7 0 0 0-5-2"/><path d="M12 7v11M10 16h4"/></svg>',
-    
-    // Carthage Mullah Promoted (Upgraded Tanit with sun rays / double crescent)
-    youC: '<svg viewBox="0 0 24 24" fill="none" stroke="#ffe066" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><circle cx="12" cy="5" r="2.5"/><path d="M5 9h14"/><path d="M12 9L6 17h12Z"/><path d="M3 20c5 2 13 2 18 0"/></svg>',
-    
-    // Roman Mullah Promoted (Crest Helmet)
-    cpuC: '<svg viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><path d="M8 5a4 4 0 0 1 8 0"/><path d="M5 11a7 7 0 0 0 14 0v3H5v-3z"/><path d="M12 11v6"/></svg>',
-    
-    // Carthage Sultan (Golden Crown)
-    youW: '<svg viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z" /><path d="M3 20h18" /></svg>',
-    
-    // Roman Sultan (Imperial Silver & Crimson Crown)
-    cpuW: '<svg viewBox="0 0 24 24" fill="none" stroke="#ee5253" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z" /><path d="M3 20h18" /></svg>'
+    // Light Soldier — Tanit shield emblem (clean, balanced)
+    you: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><circle cx="12" cy="6.2" r="2.6"/><path d="M5.5 10.5h13"/><path d="M12 10.5L6.6 19.5h10.8Z"/></svg>',
+
+    // Dark Soldier — Roman gladius + wreath (distinct silhouette)
+    cpu: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><path d="M5.5 14.5c-1-3-1-7 2-10a7 7 0 0 1 4.5-2"/><path d="M18.5 14.5c1-3 1-7-2-10a7 7 0 0 0-4.5-2"/><path d="M12 6.5v12M9.8 16.4h4.4"/></svg>',
+
+    // Light Mullah — promoted Tanit with radiant base
+    youC: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><circle cx="12" cy="5" r="2.4"/><path d="M5.5 9h13"/><path d="M12 9L6.6 17h10.8Z"/><path d="M3.5 19.5c5 2 11.5 2 17 0"/></svg>',
+
+    // Dark Mullah — crested helmet
+    cpuC: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><path d="M8 5a4 4 0 0 1 8 0"/><path d="M5 11a7 7 0 0 0 14 0v3H5z"/><path d="M12 11v6.5"/></svg>',
+
+    // Light Sultan — crown
+    youW: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><path d="M3 6l3.5 11h11L21 6l-5 5-4-6-4 6-5-5z"/><path d="M5 20.5h14"/></svg>',
+
+    // Dark Sultan — crown
+    cpuW: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><path d="M3 6l3.5 11h11L21 6l-5 5-4-6-4 6-5-5z"/><path d="M5 20.5h14"/></svg>'
   };
 
   function createPieceElement(v, isPop) {
@@ -474,9 +474,10 @@
     hud(); 
   }
 
-  function hud(){ 
-    $('youCap').textContent=youCap; 
-    $('cpuCap').textContent=cpuCap; 
+  function hud(){
+    $('youCap').textContent=youCap;
+    $('cpuCap').textContent=cpuCap;
+    var stEl=$('status'); if(stEl){ stEl.classList.toggle('thinking', busy && !over); }
     if(over)return;
     
     var hintEl = document.querySelector('.hint');
